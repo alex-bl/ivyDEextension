@@ -25,8 +25,6 @@ public class IvyDEsecurityHelper {
     
     public static void addCredentials(SecuritySetup setup){
         CredentialsStore.INSTANCE.addCredentials(setup.getRealm(), setup.getHost(), setup.getUserName(), setup.getPwd());
-        Message.debug("Credentials added: "+CredentialsStore.INSTANCE);
-        System.out.println("Credentials added: "+CredentialsStore.INSTANCE);
     }
     
 }
