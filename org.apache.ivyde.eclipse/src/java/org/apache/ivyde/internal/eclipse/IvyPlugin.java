@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import org.apache.ivy.Ivy;
 import org.apache.ivyde.common.ivyfile.IvyFileResourceListener;
+import org.apache.ivyde.eclipse.IvyDEsecurityHelper;
 import org.apache.ivyde.eclipse.cp.IvyClasspathContainer;
 import org.apache.ivyde.eclipse.cp.IvyClasspathContainerHelper;
 import org.apache.ivyde.internal.eclipse.cpcontainer.IvyAttachementManager;
@@ -131,7 +132,7 @@ public class IvyPlugin extends AbstractUIPlugin {
     /**
      * This method is called upon plug-in activation
      */
-    public void start(BundleContext context) throws Exception {
+    public void start(BundleContext context) throws Exception {                
         super.start(context);
         this.bundleContext = context;
         logInfo("starting IvyDE plugin");
@@ -148,8 +149,8 @@ public class IvyPlugin extends AbstractUIPlugin {
         retrieveSetupManager = new RetrieveSetupManager();
 
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.addSaveParticipant(this, retrieveSetupManager);
-
+        workspace.addSaveParticipant(this, retrieveSetupManager);        
+        
         colorManager = new ColorManager();
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
@@ -221,7 +222,7 @@ public class IvyPlugin extends AbstractUIPlugin {
             osgiAvailable = false;
             osgiClasspathAvailable = false;
         }
-
+        IvyDEsecurityHelper.addCredentials(IvyPlugin.getPreferenceStoreHelper().getSecuritySetup());
         logInfo("IvyDE plugin started");
     }
 

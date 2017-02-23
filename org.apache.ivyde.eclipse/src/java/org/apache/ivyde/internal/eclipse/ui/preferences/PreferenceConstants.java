@@ -131,6 +131,15 @@ public final class PreferenceConstants {
 
     public static final String ERROR_POPUP = "error.popup";
 
+    public static final String SECURITY_HOST = "security.host";    
+    
+    public static final String SECURITY_REALM = "security.realm";
+    
+    public static final String SECURITY_USERNAME = "security.username";
+    
+    public static final String SECURITY_PWD = "security.pwd";
+    
+    
     public static final Set/*<String>*/ ALL = new HashSet();
 
     static {
