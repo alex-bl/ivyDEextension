@@ -19,13 +19,13 @@ package org.apache.ivyde.eclipse.cp;
 
 public class SecuritySetup {
 
-    private String host;
+    private String host="";
     
-    private String realm;
+    private String realm="";
 
-    private String userName;
+    private String userName="";
 
-    private String pwd;
+    private String pwd="";
 
     /**
      * Default constructor
@@ -102,4 +102,8 @@ public class SecuritySetup {
         this.pwd = pwd;
     }
 
+    @Override
+    public String toString(){
+        return "[host='"+this.host+", realm='"+this.realm+"' user='"+this.userName+"' pwd='"+this.pwd+"']";
+    }
 }

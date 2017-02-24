@@ -18,6 +18,7 @@
 package org.apache.ivyde.internal.eclipse.ui.preferences;
 
 import org.apache.ivyde.eclipse.IvyDEsecurityHelper;
+import org.apache.ivyde.eclipse.cp.SecuritySetup;
 import org.apache.ivyde.internal.eclipse.IvyPlugin;
 import org.apache.ivyde.internal.eclipse.ui.SecuritySetupEditor;
 import org.eclipse.jface.preference.PreferencePage;
@@ -48,24 +49,22 @@ public class SecuritySetupPreferencePage extends PreferencePage implements IWork
         securitySetupComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
         //TODO: SecuritySetup()
-        securitySetupComposite.init(IvyPlugin.getPreferenceStoreHelper().getSecuritySetup());
-        IvyDEsecurityHelper.addCredentials(IvyPlugin.getPreferenceStoreHelper().getSecuritySetup());
+        securitySetupComposite.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());        
 
         return securitySetupComposite;
     }
 
-    public boolean performOk() {
-        IvyDEPreferenceStoreHelper helper = IvyPlugin.getPreferenceStoreHelper();
-        
+    public boolean performOk() {        
         //TODO: SecuritySetup()
-        helper.setSecuritySetup(securitySetupComposite.getSecuritySetup());
-        IvyDEsecurityHelper.addCredentials(securitySetupComposite.getSecuritySetup());
+        SecuritySetup credentials = securitySetupComposite.getSecuritySetup();
+        IvyDEsecurityHelper.addCredentialsToSecureStorage(credentials);
+        IvyDEsecurityHelper.addCredentialsToIvyCredentialStorage(credentials);
         
         return true;
     }
 
     protected void performDefaults() {
       //TODO: SecuritySetup()
-        securitySetupComposite.init(PreferenceInitializer.DEFAULT_SECURITY_SETUP);
+        securitySetupComposite.init(new SecuritySetup());
     }
 }

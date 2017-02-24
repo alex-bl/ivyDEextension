@@ -132,10 +132,17 @@ public class IvyPlugin extends AbstractUIPlugin {
     /**
      * This method is called upon plug-in activation
      */
-    public void start(BundleContext context) throws Exception {                
+    public void start(BundleContext context) throws Exception {
         super.start(context);
         this.bundleContext = context;
         logInfo("starting IvyDE plugin");
+
+        if (IvyDEsecurityHelper.credentialsInSecureStorage()) {
+            IvyDEsecurityHelper.cpyCredentialsFromSecureToIvyStorage();
+            logInfo("Credentials loaded from secure storage");            
+        }else{
+            logInfo("No credentials stored in secure storage");
+        }
 
         Matcher matcher = IVY_VERSION_PATTERN.matcher(Ivy.getIvyVersion());
         if (matcher.matches()) {
@@ -149,8 +156,8 @@ public class IvyPlugin extends AbstractUIPlugin {
         retrieveSetupManager = new RetrieveSetupManager();
 
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.addSaveParticipant(this, retrieveSetupManager);        
-        
+        workspace.addSaveParticipant(this, retrieveSetupManager);
+
         colorManager = new ColorManager();
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
@@ -167,8 +174,8 @@ public class IvyPlugin extends AbstractUIPlugin {
                         prefStoreChanged();
                     }
                 } catch (JavaModelException e) {
-                    MessageDialog.openError(IvyPlugin.getDefault().getWorkbench()
-                            .getActiveWorkbenchWindow().getShell(),
+                    MessageDialog.openError(
+                        IvyPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell(),
                         "Unable to trigger the update the IvyDE classpath containers",
                         e.getMessage());
                 }
@@ -199,8 +206,8 @@ public class IvyPlugin extends AbstractUIPlugin {
         ivyMarkerManager = new IvyMarkerManager();
 
         File stateLocation = getStateLocation().toFile();
-        ivyAttachementManager = new IvyAttachementManager(new File(stateLocation,
-                "attachements.properties"));
+        ivyAttachementManager = new IvyAttachementManager(
+                new File(stateLocation, "attachements.properties"));
         File containersStateDir = new File(stateLocation, "cpstates");
         if (!containersStateDir.exists()) {
             containersStateDir.mkdirs();
@@ -212,8 +219,8 @@ public class IvyPlugin extends AbstractUIPlugin {
             Class.forName("org.apache.ivy.osgi.core.ManifestParser");
             osgiAvailable = true;
             try {
-                Class.forName("org.apache.ivy.osgi.core.BundleInfo").getDeclaredMethod(
-                    "getClasspath");
+                Class.forName("org.apache.ivy.osgi.core.BundleInfo")
+                        .getDeclaredMethod("getClasspath");
                 osgiClasspathAvailable = true;
             } catch (Exception e) {
                 osgiClasspathAvailable = false;
@@ -222,7 +229,6 @@ public class IvyPlugin extends AbstractUIPlugin {
             osgiAvailable = false;
             osgiClasspathAvailable = false;
         }
-        IvyDEsecurityHelper.addCredentials(IvyPlugin.getPreferenceStoreHelper().getSecuritySetup());
         logInfo("IvyDE plugin started");
     }
 
@@ -406,7 +412,7 @@ public class IvyPlugin extends AbstractUIPlugin {
      * @return the adapted object
      */
 
-    public static/* <T> T */Object adapt(Object object, Class/* <T> */type) {
+    public static/* <T> T */Object adapt(Object object, Class/* <T> */ type) {
         if (type.isInstance(object)) {
             return /* (T) */object;
         } else if (object instanceof IAdaptable) {

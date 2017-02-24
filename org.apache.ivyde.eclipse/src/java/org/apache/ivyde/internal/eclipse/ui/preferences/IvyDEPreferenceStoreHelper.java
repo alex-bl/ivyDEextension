@@ -21,7 +21,6 @@ import org.apache.ivyde.eclipse.cp.AdvancedSetup;
 import org.apache.ivyde.eclipse.cp.ClasspathSetup;
 import org.apache.ivyde.eclipse.cp.MappingSetup;
 import org.apache.ivyde.eclipse.cp.RetrieveSetup;
-import org.apache.ivyde.eclipse.cp.SecuritySetup;
 import org.apache.ivyde.eclipse.cp.SettingsSetup;
 import org.apache.ivyde.internal.eclipse.cpcontainer.IvyClasspathUtil;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -139,22 +138,6 @@ public class IvyDEPreferenceStoreHelper {
                 .setValue(PreferenceConstants.MAP_IF_ONLY_ONE_SOURCE, setup.isMapIfOnlyOneSource());
         prefStore.setValue(PreferenceConstants.MAP_IF_ONLY_ONE_JAVADOC,
             setup.isMapIfOnlyOneJavadoc());
-    }
-    
-    public SecuritySetup getSecuritySetup() {
-        SecuritySetup setup = new SecuritySetup();
-        setup.setHost(prefStore.getString(PreferenceConstants.SECURITY_HOST));
-        setup.setRealm(prefStore.getString(PreferenceConstants.SECURITY_REALM));
-        setup.setUserName(prefStore.getString(PreferenceConstants.SECURITY_USERNAME));
-        setup.setPwd(prefStore.getString(PreferenceConstants.SECURITY_PWD));
-        return setup;
-    }
-
-    public void setSecuritySetup(SecuritySetup setup) {
-        prefStore.setValue(PreferenceConstants.SECURITY_HOST, setup.getHost());
-        prefStore.setValue(PreferenceConstants.SECURITY_REALM, setup.getRealm());
-        prefStore.setValue(PreferenceConstants.SECURITY_USERNAME, setup.getUserName());
-        prefStore.setValue(PreferenceConstants.SECURITY_PWD, setup.getPwd());        
     }
 
     public AdvancedSetup getAdvancedSetup() {

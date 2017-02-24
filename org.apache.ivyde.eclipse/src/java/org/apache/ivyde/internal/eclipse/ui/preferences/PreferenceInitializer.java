@@ -22,7 +22,6 @@ import org.apache.ivyde.eclipse.cp.AdvancedSetup;
 import org.apache.ivyde.eclipse.cp.ClasspathSetup;
 import org.apache.ivyde.eclipse.cp.MappingSetup;
 import org.apache.ivyde.eclipse.cp.RetrieveSetup;
-import org.apache.ivyde.eclipse.cp.SecuritySetup;
 import org.apache.ivyde.eclipse.cp.SettingsSetup;
 import org.apache.ivyde.internal.eclipse.IvyPlugin;
 import org.apache.ivyde.internal.eclipse.cpcontainer.IvyClasspathInitializer;
@@ -116,15 +115,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     public static final boolean DEFAULT_OPEN_IVY_CONSOLE_ON_STARTUP = false;
 
     public static final MappingSetup DEFAULT_MAPPING_SETUP = new MappingSetup();
-    
-    public static final SecuritySetup DEFAULT_SECURITY_SETUP = new SecuritySetup();
-    
-    //TODO: defaults needed?
-    public static final String DEFAULT_SECURITY_HOST = "";    
-    public static final String DEFAULT_SECURITY_REALM = "";
-    public static final String DEFAULT_SECURITY_USERNAME = "";
-    public static final String DEFAULT_SECURITY_PWD = "";
-        
 
     static {
         DEFAULT_MAPPING_SETUP.setSourceTypes(IvyClasspathUtil.split(DEFAULT_SOURCES_TYPES));
@@ -133,11 +123,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         DEFAULT_MAPPING_SETUP.setJavadocSuffixes(IvyClasspathUtil.split(DEFAULT_JAVADOC_SUFFIXES));
         DEFAULT_MAPPING_SETUP.setMapIfOnlyOneSource(DEFAULT_MAP_IF_ONLY_ONE_SOURCE);
         DEFAULT_MAPPING_SETUP.setMapIfOnlyOneJavadoc(DEFAULT_MAP_IF_ONLY_ONE_JAVADOC);
-
-        DEFAULT_SECURITY_SETUP.setHost(DEFAULT_SECURITY_HOST);
-        DEFAULT_SECURITY_SETUP.setRealm(DEFAULT_SECURITY_REALM);
-        DEFAULT_SECURITY_SETUP.setUserName(DEFAULT_SECURITY_USERNAME);
-        DEFAULT_SECURITY_SETUP.setPwd(DEFAULT_SECURITY_PWD);        
     }
 
     public static final boolean DEFAULT_RESOLVE_BEFORE_LAUNCH = false;
@@ -168,7 +153,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     public static final boolean DEFAULT_ERROR_POPUP = true;
 
     public void initializeDefaultPreferences() {
-        //TODO: init here?
         IPreferenceStore store = IvyPlugin.getDefault().getPreferenceStore();
         store.setDefault(PreferenceConstants.P_BOOLEAN, true);
         store.setDefault(PreferenceConstants.P_CHOICE, "choice2");
@@ -231,11 +215,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         store.setDefault(PreferenceConstants.OFFLINE, DEFAULT_OFFLINE);
         store.setDefault(PreferenceConstants.ERROR_POPUP, DEFAULT_ERROR_POPUP);
-        
-        store.setDefault(PreferenceConstants.SECURITY_HOST, DEFAULT_SECURITY_HOST);
-        store.setDefault(PreferenceConstants.SECURITY_REALM, DEFAULT_SECURITY_REALM);
-        store.setDefault(PreferenceConstants.SECURITY_USERNAME, DEFAULT_SECURITY_USERNAME);
-        store.setDefault(PreferenceConstants.SECURITY_PWD, DEFAULT_SECURITY_PWD);
     }
 
     private String asString(RGB value) {
