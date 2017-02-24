@@ -25,7 +25,7 @@ import org.eclipse.equinox.security.storage.StorageException;
 
 public class IvyDEsecurityHelper {
 
-    private static final String IVY_DE_CREDENTIALS_NODE = "ivyDE";
+    private static final String IVY_DE_CREDENTIALS_NODE = "org.apache.ivyde.credentials";
 
     private static final String HOST_KEY = "host";
 
@@ -49,8 +49,8 @@ public class IvyDEsecurityHelper {
         ISecurePreferences node = preferences.node(IVY_DE_CREDENTIALS_NODE);
 
         try {
-            node.put(HOST_KEY, setup.getHost(), true);
-            node.put(REALM_KEY, setup.getRealm(), true);
+            node.put(HOST_KEY, setup.getHost(), false);
+            node.put(REALM_KEY, setup.getRealm(), false);
             node.put(USERNAME_KEY, setup.getUserName(), true);
             node.put(PASSWORD_KEY, setup.getPwd(), true);
         } catch (StorageException e1) {
