@@ -17,6 +17,7 @@
  */
 package org.apache.ivyde.eclipse;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,8 +61,12 @@ public class IvyDEsecurityHelper {
             childNode.put(REALM_KEY, setup.getRealm(), false);
             childNode.put(USERNAME_KEY, setup.getUserName(), true);
             childNode.put(PASSWORD_KEY, setup.getPwd(), true);
+            childNode.flush();
         } catch (StorageException e1) {
             e1.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
@@ -83,6 +88,33 @@ public class IvyDEsecurityHelper {
             }
         }
         return setupValues;
+    }
+
+    public static void removeCredentials(String host, String realm) {
+        removeCredentialsFromSecureStore(host);
+        invalidateIvyCredentials(host, realm);
+    }
+
+    private static void removeCredentialsFromSecureStore(String host) {
+        System.out.println(host);
+        ISecurePreferences preferences = SecurePreferencesFactory.getDefault();
+        if (preferences.nodeExists(IVY_DE_CREDENTIALS_BASE_NODE)) {
+            ISecurePreferences node = preferences.node(IVY_DE_CREDENTIALS_BASE_NODE);
+            if (node.nodeExists(host)) {
+                node.node(host).removeNode();
+                try {
+                    node.flush();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private static void invalidateIvyCredentials(String host, String realm) {
+        // need to invalidate => on credentialStore just add-ops allowed
+        CredentialsStore.INSTANCE.addCredentials(host, realm, null, null);
     }
 
     public static boolean credentialsInSecureStorage() {

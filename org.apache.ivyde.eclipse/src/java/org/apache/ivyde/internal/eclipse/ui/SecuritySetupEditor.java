@@ -74,10 +74,12 @@ public class SecuritySetupEditor extends Composite {
         editBtn = new Button(credentialsGroup, SWT.PUSH);
         editBtn.setText("Edit...");
         editBtn.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false,1,1));
+        editBtn.setEnabled(false);
         
         deleteBtn = new Button(credentialsGroup, SWT.PUSH);
         deleteBtn.setText("Remove");                
         deleteBtn.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false,1,1));        
+        deleteBtn.setEnabled(false);
     }
 
     public void init(List<SecuritySetup> setup) {

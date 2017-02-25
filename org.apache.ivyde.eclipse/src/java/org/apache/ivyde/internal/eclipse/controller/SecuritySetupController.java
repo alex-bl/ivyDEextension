@@ -17,7 +17,6 @@
  */
 package org.apache.ivyde.internal.eclipse.controller;
 
-
 import org.apache.ivyde.eclipse.IvyDEsecurityHelper;
 import org.apache.ivyde.eclipse.cp.SecuritySetup;
 import org.apache.ivyde.internal.eclipse.ui.SecuritySetupEditor;
@@ -33,38 +32,47 @@ import org.eclipse.swt.events.SelectionListener;
 public class SecuritySetupController {
 
     private SecuritySetupEditor setupEditorGUI;
+
     private SecuritySetupDialog addDialog;
+
     private SecuritySetup currentSelection;
-    
+
+    private String selectionHost;
+
+    private String selectionRealm;
+
     /**
      * @param setupEditorGUI
      * @param addDialog
      */
     public SecuritySetupController(SecuritySetupEditor setupEditorGUI) {
-        this.setupEditorGUI = setupEditorGUI;       
+        this.setupEditorGUI = setupEditorGUI;
     }
 
     public void addHandlers() {
         setupEditorGUI.getAddBtn().addSelectionListener(this.createAddBtnSelectionAdapter());
         setupEditorGUI.getEditBtn().addSelectionListener(this.createEditBtnSelectionAdapter());
         setupEditorGUI.getDeleteBtn().addSelectionListener(this.createDelBtnSelectionAdapter());
-        setupEditorGUI.getTableViewer().addSelectionChangedListener(this.createSelectionChangedListener());
+        setupEditorGUI.getTableViewer()
+                .addSelectionChangedListener(this.createSelectionChangedListener());
     }
 
     private SelectionListener createAddBtnSelectionAdapter() {
         return new SelectionAdapter() {
             @Override
-            public void widgetSelected(SelectionEvent e) {           
-                addDialog = new SecuritySetupDialog(setupEditorGUI.getShell(), new SecuritySetup());                
-//                initDialog(new SecuritySetup());
-                if(addDialog.open()== Window.OK){
-                    //TODO: add not completely working...
+            public void widgetSelected(SelectionEvent e) {
+                addDialog = new SecuritySetupDialog(setupEditorGUI.getShell(), new SecuritySetup());
+                // initDialog(new SecuritySetup());
+                if (addDialog.open() == Window.OK) {
+                    // TODO: add not completely working...
                     IvyDEsecurityHelper.addCredentialsToSecureStorage(addDialog.getContentHolder());
-                    IvyDEsecurityHelper.addCredentialsToIvyCredentialStorage(addDialog.getContentHolder());
-                    //TODO: using init to reload directly from secure storage or use an intermediate-container?
-                    setupEditorGUI.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());                    
-                }else{
-                    //TODO: do something?
+                    IvyDEsecurityHelper
+                            .addCredentialsToIvyCredentialStorage(addDialog.getContentHolder());
+                    // TODO: using init to reload directly from secure storage or use an
+                    // intermediate-container?
+                    setupEditorGUI.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());
+                } else {
+                    // TODO: do something?
                     System.out.println("cancel pressed");
                 }
                 addDialog.close();
@@ -72,25 +80,30 @@ public class SecuritySetupController {
         };
     }
 
-    //TODO: initDialog currently not working: empty values => need to set directly inside constructor?
+    // TODO: initDialog currently not working: empty values => need to set directly inside
+    // constructor?
     private SelectionListener createEditBtnSelectionAdapter() {
         return new SelectionAdapter() {
             @Override
-            public void widgetSelected(SelectionEvent e) {                
+            public void widgetSelected(SelectionEvent e) {
                 addDialog = new SecuritySetupDialog(setupEditorGUI.getShell(), currentSelection);
-                //initDialog(currentSelection);
-                if(addDialog.open()== Window.OK){
-                    //TODO: edit adds and also add not completely working...
+                // initDialog(currentSelection);
+                if (addDialog.open() == Window.OK) {
+                    IvyDEsecurityHelper.removeCredentials(selectionHost, selectionRealm);
                     IvyDEsecurityHelper.addCredentialsToSecureStorage(addDialog.getContentHolder());
-                    IvyDEsecurityHelper.addCredentialsToIvyCredentialStorage(addDialog.getContentHolder());
-                    //TODO: using init to reload directly from secure storage or use an intermediate-container?
-                    setupEditorGUI.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());                    
-                }else{
-                    //TODO: do something?
+                    IvyDEsecurityHelper
+                            .addCredentialsToIvyCredentialStorage(addDialog.getContentHolder());
+                    // TODO: using init to reload directly from secure storage or use an
+                    // intermediate-container?
+                    setupEditorGUI.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());
+                    setupEditorGUI.getEditBtn().setEnabled(false);
+                    setupEditorGUI.getDeleteBtn().setEnabled(false); 
+                } else {
+                    // TODO: do something?
                     System.out.println("cancel pressed");
                 }
                 addDialog.close();
-            }            
+            }
         };
     }
 
@@ -98,21 +111,30 @@ public class SecuritySetupController {
         return new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                System.out.println("delete");
+                IvyDEsecurityHelper.removeCredentials(selectionHost, selectionRealm);
+                setupEditorGUI.init(IvyDEsecurityHelper.getCredentialsFromSecureStore()); 
+                setupEditorGUI.getEditBtn().setEnabled(false);
+                setupEditorGUI.getDeleteBtn().setEnabled(false); 
             }
         };
     }
-    
-    private ISelectionChangedListener createSelectionChangedListener(){
+
+    private ISelectionChangedListener createSelectionChangedListener() {
         return new ISelectionChangedListener() {
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
-                IStructuredSelection selection = (IStructuredSelection)event.getSelection();
-                currentSelection = (SecuritySetup)selection.getFirstElement();                
+                IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+                currentSelection = (SecuritySetup) selection.getFirstElement();
+                setupEditorGUI.getEditBtn().setEnabled(true);
+                setupEditorGUI.getDeleteBtn().setEnabled(true);                
+                if (currentSelection != null) {
+                    selectionHost = currentSelection.getHost();
+                    selectionRealm = currentSelection.getRealm();
+                }
             }
         };
     }
-    
+
     // TODO: need this methods?
     private void initDialog(SecuritySetup setup) {
         this.addDialog.getHostText().setText(setup.getHost());
