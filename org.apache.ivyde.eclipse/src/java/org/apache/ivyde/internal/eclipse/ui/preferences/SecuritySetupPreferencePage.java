@@ -20,6 +20,7 @@ package org.apache.ivyde.internal.eclipse.ui.preferences;
 import org.apache.ivyde.eclipse.IvyDEsecurityHelper;
 import org.apache.ivyde.eclipse.cp.SecuritySetup;
 import org.apache.ivyde.internal.eclipse.IvyPlugin;
+import org.apache.ivyde.internal.eclipse.controller.SecuritySetupController;
 import org.apache.ivyde.internal.eclipse.ui.SecuritySetupEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -35,6 +36,7 @@ public class SecuritySetupPreferencePage extends PreferencePage implements IWork
     public static final String PEREFERENCE_PAGE_ID = "org.apache.ivyde.eclipse.ui.preferences.SecuritySetupPreferencePage";
 
     private SecuritySetupEditor securitySetupComposite;
+    private SecuritySetupController buttonController;
 
     public SecuritySetupPreferencePage() {
         setPreferenceStore(IvyPlugin.getDefault().getPreferenceStore());
@@ -48,6 +50,9 @@ public class SecuritySetupPreferencePage extends PreferencePage implements IWork
         securitySetupComposite = new SecuritySetupEditor(parent, SWT.NONE);
         securitySetupComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
+        buttonController = new SecuritySetupController(securitySetupComposite);
+        buttonController.addHandlers();
+
         //TODO: SecuritySetup()
         securitySetupComposite.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());        
 
@@ -55,16 +60,17 @@ public class SecuritySetupPreferencePage extends PreferencePage implements IWork
     }
 
     public boolean performOk() {        
-        //TODO: SecuritySetup()
-        SecuritySetup credentials = securitySetupComposite.getSecuritySetup();
-        IvyDEsecurityHelper.addCredentialsToSecureStorage(credentials);
-        IvyDEsecurityHelper.addCredentialsToIvyCredentialStorage(credentials);
+        //TODO: Do what? => just copy credentials to ivyStorage or also copy them to eclipse-storage?
+//        SecuritySetup credentials = securitySetupComposite.getSecuritySetup();
+//        IvyDEsecurityHelper.addCredentialsToSecureStorage(credentials);
+//        IvyDEsecurityHelper.addCredentialsToIvyCredentialStorage(credentials);
+        IvyDEsecurityHelper.cpyCredentialsFromSecureToIvyStorage();
         
         return true;
     }
 
     protected void performDefaults() {
-      //TODO: SecuritySetup()
-        securitySetupComposite.init(new SecuritySetup());
+      //TODO: Do nothing? => coupled with secure-store...
+      //  securitySetupComposite.init(new SecuritySetup());
     }
 }

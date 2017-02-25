@@ -44,6 +44,19 @@ public class SecuritySetup {
     
     
     /**
+     * @param host
+     * @param realm
+     * @param userName
+     * @param pwd
+     */
+    public SecuritySetup(String host, String realm, String userName, String pwd) {
+        this.host = host;
+        this.realm = realm;
+        this.userName = userName;
+        this.pwd = pwd;
+    }
+
+    /**
      * @return the host
      */
     public String getHost() {
@@ -100,6 +113,45 @@ public class SecuritySetup {
      */
     public void setPwd(String pwd) {
         this.pwd = pwd;
+    }
+
+    
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((host == null) ? 0 : host.hashCode());
+        result = prime * result + ((realm == null) ? 0 : realm.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SecuritySetup other = (SecuritySetup) obj;
+        if (host == null) {
+            if (other.host != null)
+                return false;
+        } else if (!host.equals(other.host))
+            return false;
+        if (realm == null) {
+            if (other.realm != null)
+                return false;
+        } else if (!realm.equals(other.realm))
+            return false;
+        return true;
     }
 
     @Override

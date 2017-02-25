@@ -17,99 +17,110 @@
  */
 package org.apache.ivyde.internal.eclipse.ui;
 
+import java.util.List;
+
+import org.apache.ivyde.eclipse.GUIfactoryHelper;
 import org.apache.ivyde.eclipse.cp.SecuritySetup;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Table;
 
 public class SecuritySetupEditor extends Composite {
-
-    public static final String TOOLTIP_HOST = "The host";
     
-    public static final String TOOLTIP_REALM = "The realm for authentication";
-
-    public static final String TOOLTIP_USERNAME = "The username";
+    private TableViewer tableViewer;
+    private Group credentialsGroup;
+    private Button addBtn;
+    private Button editBtn;
+    private Button deleteBtn;
+    private Table table;
     
-    public static final String TOOLTIP_PASSWORD = "The password";
-
-    private Text hostText;
-    
-    private Text realmText;
-
-    private Text userNameText;
-
-    private Text pwdText;
-
-    private Label hostLabel;
-    
-    private Label realmLabel;
-
-    private Label userNameLabel;
-
-    private Label pwdLabel;
-
     public SecuritySetupEditor(Composite parent, int style) {
         super(parent, style);
-        setLayout(new GridLayout(2, false));
+        setLayout(new GridLayout());
+                
+        credentialsGroup = new Group(this, style);
+        credentialsGroup.setText("Credentials");
+        credentialsGroup.setLayout(new GridLayout(2, false));
+        credentialsGroup.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, true, false,1,1));
 
-        hostLabel = new Label(this, SWT.NONE);
-        hostLabel.setText("Host:");
+        tableViewer = new TableViewer(credentialsGroup,
+                SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 
-        hostText = new Text(this, SWT.SINGLE | SWT.BORDER);
-        hostText.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false));
-        hostText.setToolTipText(TOOLTIP_HOST);
+        GUIfactoryHelper.buildTableColumn(tableViewer, 100, "Host", GUIfactoryHelper.buildHostLabelProvider());
+        GUIfactoryHelper.buildTableColumn(tableViewer, 150, "Realm", GUIfactoryHelper.buildRealmLabelProvider());
+        GUIfactoryHelper.buildTableColumn(tableViewer, 100, "Username", GUIfactoryHelper.buildUsernameLabelProvider());
+        GUIfactoryHelper.buildTableColumn(tableViewer, 100, "Pwd", GUIfactoryHelper.buildPwdLabelProvider());
+                
+        // make lines and header visible
+        table = tableViewer.getTable();
+        table.setParent(credentialsGroup);
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
+
+        GridData tableGD = new GridData(GridData.BEGINNING, GridData.BEGINNING, true, false,1,3);
+        tableGD.heightHint=200;
+        table.setLayoutData(tableGD);
         
-        realmLabel = new Label(this, SWT.NONE);
-        realmLabel.setText("Realm:");
-
-        realmText = new Text(this, SWT.SINGLE | SWT.BORDER);
-        realmText.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false));
-        realmText.setToolTipText(TOOLTIP_REALM);
-
-        userNameLabel = new Label(this, SWT.NONE);
-        userNameLabel.setText("Username:");
-
-        userNameText = new Text(this, SWT.SINGLE | SWT.BORDER);
-        userNameText.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false));
-        userNameText.setToolTipText(TOOLTIP_USERNAME);
-
-        pwdLabel = new Label(this, SWT.NONE);
-        pwdLabel.setText("Password:");
-
-        pwdText = new Text(this, SWT.PASSWORD | SWT.BORDER);
-        pwdText.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-        pwdText.setToolTipText(TOOLTIP_PASSWORD);
+        addBtn = new Button(credentialsGroup, SWT.PUSH);
+        addBtn.setText("Add...");
+        addBtn.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false,1,1));
+        
+        editBtn = new Button(credentialsGroup, SWT.PUSH);
+        editBtn.setText("Edit...");
+        editBtn.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false,1,1));
+        
+        deleteBtn = new Button(credentialsGroup, SWT.PUSH);
+        deleteBtn.setText("Remove");                
+        deleteBtn.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false,1,1));        
     }
 
-    public void init(SecuritySetup setup) {        
-        hostText.setText(setup.getHost());
-        realmText.setText(setup.getRealm());
-        userNameText.setText(setup.getUserName());
-        pwdText.setText(setup.getPwd());
+    public void init(List<SecuritySetup> setup) {
+       this.tableViewer.setContentProvider(ArrayContentProvider.getInstance());
+       this.tableViewer.setInput(setup);
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(boolean enabled) {       
         super.setEnabled(enabled);
-        hostLabel.setEnabled(enabled);
-        hostText.setEnabled(enabled);
-        realmLabel.setEnabled(enabled);
-        realmText.setEnabled(enabled);
-        userNameLabel.setEnabled(enabled);
-        userNameText.setEnabled(enabled);
-        pwdLabel.setEnabled(enabled);
-        pwdText.setEnabled(enabled);
+        credentialsGroup.setEnabled(enabled);
+        addBtn.setEnabled(enabled);
+        editBtn.setEnabled(enabled);
+        deleteBtn.setEnabled(enabled);
+        table.setEnabled(enabled);        
     }
 
-    public SecuritySetup getSecuritySetup() {
-        SecuritySetup setup = new SecuritySetup();
-        setup.setHost(hostText.getText());
-        setup.setRealm(realmText.getText());
-        setup.setUserName(userNameText.getText());
-        setup.setPwd(pwdText.getText());
-        
-        return setup;
+    /**
+     * @return the addBtn
+     */
+    public Button getAddBtn() {
+        return addBtn;
     }
+
+    /**
+     * @return the editBtn
+     */
+    public Button getEditBtn() {
+        return editBtn;
+    }
+
+    /**
+     * @return the deleteBtn
+     */
+    public Button getDeleteBtn() {
+        return deleteBtn;
+    }
+
+    /**
+     * @return the tableViewer
+     */
+    public TableViewer getTableViewer() {
+        return tableViewer;
+    }
+    
+    
 }

@@ -17,6 +17,9 @@
  */
 package org.apache.ivyde.eclipse;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.ivy.util.url.CredentialsStore;
 import org.apache.ivyde.eclipse.cp.SecuritySetup;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
@@ -25,7 +28,7 @@ import org.eclipse.equinox.security.storage.StorageException;
 
 public class IvyDEsecurityHelper {
 
-    private static final String IVY_DE_CREDENTIALS_NODE = "org.apache.ivyde.credentials";
+    private static final String IVY_DE_CREDENTIALS_BASE_NODE = "org.apache.ivyde.credentials";
 
     private static final String HOST_KEY = "host";
 
@@ -41,43 +44,49 @@ public class IvyDEsecurityHelper {
     }
 
     public static void cpyCredentialsFromSecureToIvyStorage() {
-        addCredentialsToIvyCredentialStorage(getCredentialsFromSecureStore());
+        List<SecuritySetup> credentials = getCredentialsFromSecureStore();
+        for (SecuritySetup entry : credentials) {
+            addCredentialsToIvyCredentialStorage(entry);
+        }
     }
 
     public static void addCredentialsToSecureStorage(SecuritySetup setup) {
         ISecurePreferences preferences = SecurePreferencesFactory.getDefault();
-        ISecurePreferences node = preferences.node(IVY_DE_CREDENTIALS_NODE);
+        ISecurePreferences baseNode = preferences.node(IVY_DE_CREDENTIALS_BASE_NODE);
+        ISecurePreferences childNode = baseNode.node(setup.getHost());
 
         try {
-            node.put(HOST_KEY, setup.getHost(), false);
-            node.put(REALM_KEY, setup.getRealm(), false);
-            node.put(USERNAME_KEY, setup.getUserName(), true);
-            node.put(PASSWORD_KEY, setup.getPwd(), true);
+            childNode.put(HOST_KEY, setup.getHost(), false);
+            childNode.put(REALM_KEY, setup.getRealm(), false);
+            childNode.put(USERNAME_KEY, setup.getUserName(), true);
+            childNode.put(PASSWORD_KEY, setup.getPwd(), true);
         } catch (StorageException e1) {
             e1.printStackTrace();
         }
     }
 
-    public static SecuritySetup getCredentialsFromSecureStore() {
+    public static List<SecuritySetup> getCredentialsFromSecureStore() {
         ISecurePreferences preferences = SecurePreferencesFactory.getDefault();
-        SecuritySetup setupValues = new SecuritySetup();
-        if (preferences.nodeExists(IVY_DE_CREDENTIALS_NODE)) {
-            ISecurePreferences node = preferences.node(IVY_DE_CREDENTIALS_NODE);
-            try {
-                setupValues.setHost(node.get(HOST_KEY, "localhost"));
-                setupValues.setRealm(node.get(REALM_KEY, "basic"));
-                setupValues.setUserName(node.get(USERNAME_KEY, null));
-                setupValues.setPwd(node.get(PASSWORD_KEY, null));                
-            } catch (StorageException e1) {
-                e1.printStackTrace();
+        List<SecuritySetup> setupValues = new ArrayList<SecuritySetup>();
+        if (preferences.nodeExists(IVY_DE_CREDENTIALS_BASE_NODE)) {
+            ISecurePreferences node = preferences.node(IVY_DE_CREDENTIALS_BASE_NODE);
+            String[] childNames = node.childrenNames();
+            for (String childName : childNames) {
+                ISecurePreferences childNode = node.node(childName);
+                try {
+                    setupValues.add(new SecuritySetup(childNode.get(HOST_KEY, "localhost"),
+                            childNode.get(REALM_KEY, "basic"), childNode.get(USERNAME_KEY, null),
+                            childNode.get(PASSWORD_KEY, null)));
+                } catch (StorageException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
         return setupValues;
     }
-    
-    public static boolean credentialsInSecureStorage(){
-        return SecurePreferencesFactory.getDefault().nodeExists(IVY_DE_CREDENTIALS_NODE);
+
+    public static boolean credentialsInSecureStorage() {
+        return SecurePreferencesFactory.getDefault().nodeExists(IVY_DE_CREDENTIALS_BASE_NODE);
     }
-    
 
 }
