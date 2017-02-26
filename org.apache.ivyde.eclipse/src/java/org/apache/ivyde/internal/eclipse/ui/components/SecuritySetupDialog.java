@@ -19,10 +19,12 @@ package org.apache.ivyde.internal.eclipse.ui.components;
 
 import org.apache.ivyde.eclipse.cp.SecuritySetup;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -61,7 +63,6 @@ public class SecuritySetupDialog extends Dialog {
     public SecuritySetupDialog(Shell parentShell, SecuritySetup defaultVal) {
         super(parentShell);
         this.contentHolder=defaultVal;
-        createDialogArea(parentShell);
     }
 
     @Override
@@ -101,8 +102,6 @@ public class SecuritySetupDialog extends Dialog {
         pwdText.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
         pwdText.setToolTipText(TOOLTIP_PASSWORD);
 
-        //TODO: need to be inside view?
-        this.init(this.contentHolder);
         return container;
     }
 
@@ -111,7 +110,7 @@ public class SecuritySetupDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("Add");
+        //newShell.setText("Add");
     }
 
     @Override
@@ -132,13 +131,6 @@ public class SecuritySetupDialog extends Dialog {
         pwdText.setEnabled(enabled);
 
     }
-    
-    private void init(SecuritySetup setup) {
-        this.hostText.setText(setup.getHost());
-        this.realmText.setText(setup.getRealm());
-        this.userNameText.setText(setup.getUserName());
-        this.pwdText.setText(setup.getPwd());
-    }
 
     private void saveSecuritySetup() {
         this.contentHolder = new SecuritySetup();
@@ -146,6 +138,10 @@ public class SecuritySetupDialog extends Dialog {
         this.contentHolder.setRealm(realmText.getText());
         this.contentHolder.setUserName(userNameText.getText());
         this.contentHolder.setPwd(pwdText.getText());
+    }
+
+    public Button getOkButton(){
+        return super.getButton(IDialogConstants.OK_ID);
     }
     
     @Override

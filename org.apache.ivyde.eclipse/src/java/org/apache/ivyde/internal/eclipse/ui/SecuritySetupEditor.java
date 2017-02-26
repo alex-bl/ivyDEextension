@@ -47,13 +47,13 @@ public class SecuritySetupEditor extends Composite {
         credentialsGroup = new Group(this, style);
         credentialsGroup.setText("Credentials");
         credentialsGroup.setLayout(new GridLayout(2, false));
-        credentialsGroup.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, true, false,1,1));
+        credentialsGroup.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false,1,1));
 
         tableViewer = new TableViewer(credentialsGroup,
                 SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 
         GUIfactoryHelper.buildTableColumn(tableViewer, 100, "Host", GUIfactoryHelper.buildHostLabelProvider());
-        GUIfactoryHelper.buildTableColumn(tableViewer, 150, "Realm", GUIfactoryHelper.buildRealmLabelProvider());
+        GUIfactoryHelper.buildTableColumn(tableViewer, 175, "Realm", GUIfactoryHelper.buildRealmLabelProvider());
         GUIfactoryHelper.buildTableColumn(tableViewer, 100, "Username", GUIfactoryHelper.buildUsernameLabelProvider());
         GUIfactoryHelper.buildTableColumn(tableViewer, 100, "Pwd", GUIfactoryHelper.buildPwdLabelProvider());
                 
@@ -63,22 +63,22 @@ public class SecuritySetupEditor extends Composite {
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
 
-        GridData tableGD = new GridData(GridData.BEGINNING, GridData.BEGINNING, true, false,1,3);
+        GridData tableGD = new GridData(GridData.FILL, GridData.FILL, true, false,1,3);
         tableGD.heightHint=200;
         table.setLayoutData(tableGD);
         
         addBtn = new Button(credentialsGroup, SWT.PUSH);
         addBtn.setText("Add...");
-        addBtn.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false,1,1));
+        addBtn.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, false, false,1,1));
         
         editBtn = new Button(credentialsGroup, SWT.PUSH);
         editBtn.setText("Edit...");
-        editBtn.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false,1,1));
+        editBtn.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, false, false,1,1));
         editBtn.setEnabled(false);
         
         deleteBtn = new Button(credentialsGroup, SWT.PUSH);
         deleteBtn.setText("Remove");                
-        deleteBtn.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false,1,1));        
+        deleteBtn.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, false, false,1,1));        
         deleteBtn.setEnabled(false);
     }
 

@@ -19,6 +19,7 @@ package org.apache.ivyde.eclipse;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.ivy.util.url.CredentialsStore;
@@ -27,7 +28,7 @@ import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 
-public class IvyDEsecurityHelper {
+public final class IvyDEsecurityHelper {
 
     private static final String IVY_DE_CREDENTIALS_BASE_NODE = "org.apache.ivyde.credentials";
 
@@ -39,6 +40,10 @@ public class IvyDEsecurityHelper {
 
     private static final String PASSWORD_KEY = "pwd";
 
+    private IvyDEsecurityHelper(){
+        
+    }
+    
     public static void addCredentialsToIvyCredentialStorage(SecuritySetup setup) {
         CredentialsStore.INSTANCE.addCredentials(setup.getRealm(), setup.getHost(),
             setup.getUserName(), setup.getPwd());
@@ -87,6 +92,7 @@ public class IvyDEsecurityHelper {
                 }
             }
         }
+        Collections.sort(setupValues);
         return setupValues;
     }
 
@@ -95,8 +101,18 @@ public class IvyDEsecurityHelper {
         invalidateIvyCredentials(host, realm);
     }
 
+    public static boolean hostExistsInSecureStorage(String host) {
+        ISecurePreferences preferences = SecurePreferencesFactory.getDefault();
+        if (preferences.nodeExists(IVY_DE_CREDENTIALS_BASE_NODE)) {
+            ISecurePreferences node = preferences.node(IVY_DE_CREDENTIALS_BASE_NODE);
+            if (node.nodeExists(host)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void removeCredentialsFromSecureStore(String host) {
-        System.out.println(host);
         ISecurePreferences preferences = SecurePreferencesFactory.getDefault();
         if (preferences.nodeExists(IVY_DE_CREDENTIALS_BASE_NODE)) {
             ISecurePreferences node = preferences.node(IVY_DE_CREDENTIALS_BASE_NODE);

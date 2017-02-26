@@ -18,10 +18,12 @@
 package org.apache.ivyde.eclipse;
 
 import org.apache.ivyde.eclipse.cp.SecuritySetup;
+import org.apache.ivyde.internal.eclipse.ui.components.CustomConfirmationDialog;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 
 public final class GUIfactoryHelper {
 
@@ -52,8 +54,8 @@ public final class GUIfactoryHelper {
         return new ColumnLabelProvider() {
             @Override
             public String getText(Object element) {
-               // return ((SecuritySetup) element).getUserName();
-                return SECRET;
+                return ((SecuritySetup) element).getUserName();
+                //return SECRET;
             }
         };
     }
@@ -75,5 +77,9 @@ public final class GUIfactoryHelper {
         col.getColumn().setText(header);
         col.setLabelProvider(provider);
         return col;
+    }
+    
+    public static CustomConfirmationDialog buildConfirmationDialog(Shell parentShell, String dialogTitle, String dialogMessage){
+        return new CustomConfirmationDialog(parentShell, dialogTitle, dialogMessage);
     }
 }

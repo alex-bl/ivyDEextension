@@ -17,7 +17,7 @@
  */
 package org.apache.ivyde.eclipse.cp;
 
-public class SecuritySetup {
+public class SecuritySetup implements Comparable<SecuritySetup>{
 
     private String host="";
     
@@ -157,5 +157,10 @@ public class SecuritySetup {
     @Override
     public String toString(){
         return "[host='"+this.host+", realm='"+this.realm+"' user='"+this.userName+"' pwd='"+this.pwd+"']";
+    }
+
+    @Override
+    public int compareTo(SecuritySetup o) {        
+        return this.host.compareTo(o.getHost());
     }
 }
