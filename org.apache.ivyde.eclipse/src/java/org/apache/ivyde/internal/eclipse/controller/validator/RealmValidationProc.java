@@ -17,28 +17,19 @@
  */
 package org.apache.ivyde.internal.eclipse.controller.validator;
 
-import org.eclipse.swt.widgets.Button;
-
-public class HostValidationReaction implements IValidationReaction {
-
-    private Button okButton;
+public class RealmValidationProc extends ValidationProcess {
 
     /**
-     * @param editButton
-     * @param delButton
+     * @param reaction
      */
-    public HostValidationReaction(Button okButton) {
-        this.okButton = okButton;
+    public RealmValidationProc(IValidationReaction reaction) {
+        super(reaction);
     }
 
     @Override
-    public void ok() {
-        this.okButton.setEnabled(true);
+    public boolean doValidate(Object toValidate) {
+        String realm = (String) toValidate;
+        super.setErrorMessage(EMPTY_ERROR);
+        return !realm.equals("");
     }
-
-    @Override
-    public void error() {
-        this.okButton.setEnabled(false);
-    }
-
 }

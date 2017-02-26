@@ -17,7 +17,6 @@
  */
 package org.apache.ivyde.internal.eclipse.controller.validator;
 
-import org.apache.ivyde.eclipse.IvyDEsecurityHelper;
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
@@ -28,25 +27,20 @@ public final class SecuritySetupValidatorFactory {
 
     }
 
-    public static IValidator createHostExistsValidator(final IValidationReaction reaction,
-            final IValidationExclusion exclusion) {
+    public static IValidator createValidator(final String validationProcId) {
         return new IValidator() {
             @Override
             public IStatus validate(Object value) {
-                exclusion.setCheckedValue(value);
-                if (!exclusion.exclusionNeeded()) {
-                    String host = (String) value;
-                    if (host.equals("")) {
-                        reaction.error();
-                        return ValidationStatus.error("Host cannot be empty");
-                    } else if (IvyDEsecurityHelper.hostExistsInSecureStorage(host)) {
-                        reaction.error();
-                        return ValidationStatus.error("An entry for '" + host + "' already exists");
-                    }
+                ValidationProcess validation = ValidationProcContainer.getProc(validationProcId);
+                IValidationReaction reaction = validation.getReaction();
+                if (!validation.doValidate(value)) {
+                    reaction.error();
+                    return ValidationStatus.error(validation.getErrorMessage());
                 }
                 reaction.ok();
                 return ValidationStatus.ok();
             }
         };
     }
+
 }

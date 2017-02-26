@@ -17,31 +17,21 @@
  */
 package org.apache.ivyde.eclipse.cp;
 
-public class SecuritySetup implements Comparable<SecuritySetup>{
+public class SecuritySetup implements Comparable<SecuritySetup> {
 
-    private String host="";
-    
-    private String realm="";
+    private String id = "";
 
-    private String userName="";
+    private String host = "";
 
-    private String pwd="";
+    private String realm = "";
 
-    /**
-     * Default constructor
-     */
-    public SecuritySetup() {
-        // default constructor
+    private String userName = "";
+
+    private String pwd = "";
+
+    public SecuritySetup(){
+        
     }
-
-    public void set(SecuritySetup setup) {
-        this.host = setup.host;
-        this.realm = setup.realm;
-        this.userName = setup.userName;
-        this.pwd = setup.pwd;
-    }
-
-    
     
     /**
      * @param host
@@ -57,6 +47,21 @@ public class SecuritySetup implements Comparable<SecuritySetup>{
     }
 
     /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
      * @return the host
      */
     public String getHost() {
@@ -64,7 +69,8 @@ public class SecuritySetup implements Comparable<SecuritySetup>{
     }
 
     /**
-     * @param host the host to set
+     * @param host
+     *            the host to set
      */
     public void setHost(String host) {
         this.host = host;
@@ -115,9 +121,9 @@ public class SecuritySetup implements Comparable<SecuritySetup>{
         this.pwd = pwd;
     }
 
-    
-    
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -129,7 +135,9 @@ public class SecuritySetup implements Comparable<SecuritySetup>{
         return result;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -155,12 +163,13 @@ public class SecuritySetup implements Comparable<SecuritySetup>{
     }
 
     @Override
-    public String toString(){
-        return "[host='"+this.host+", realm='"+this.realm+"' user='"+this.userName+"' pwd='"+this.pwd+"']";
+    public String toString() {
+        return "[host='" + this.host + ", realm='" + this.realm + "' user='" + this.userName
+                + "' pwd='" + this.pwd + "']";
     }
 
     @Override
-    public int compareTo(SecuritySetup o) {        
+    public int compareTo(SecuritySetup o) {
         return this.host.compareTo(o.getHost());
     }
 }

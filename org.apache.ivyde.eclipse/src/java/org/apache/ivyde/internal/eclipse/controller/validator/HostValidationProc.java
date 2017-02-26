@@ -17,29 +17,20 @@
  */
 package org.apache.ivyde.internal.eclipse.controller.validator;
 
-public class HostValidationExclusion implements IValidationExclusion {
+public class HostValidationProc extends ValidationProcess {
 
-    private boolean isAddOperation;
-    private String hostName;
-    private String checkedValue;
-        
     /**
-     * @param isAddOperation
-     * @param hostName
+     * @param reaction
      */
-    public HostValidationExclusion(boolean isAddOperation, String hostName) {
-        this.isAddOperation = isAddOperation;
-        this.hostName = hostName;
+    public HostValidationProc(IValidationReaction reaction) {
+        super(reaction);
     }
 
+    // just check if empty
     @Override
-    public boolean exclusionNeeded() {
-        return !isAddOperation && hostName.equals(checkedValue);
+    public boolean doValidate(Object toValidate) {
+        String host = (String) toValidate;
+        super.setErrorMessage(EMPTY_ERROR);
+        return !host.equals("");
     }
-
-    @Override
-    public void setCheckedValue(Object value) {
-        this.checkedValue=(String)value;
-    }
-
 }

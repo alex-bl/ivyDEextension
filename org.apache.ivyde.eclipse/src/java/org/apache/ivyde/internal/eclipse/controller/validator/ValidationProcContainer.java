@@ -17,7 +17,24 @@
  */
 package org.apache.ivyde.internal.eclipse.controller.validator;
 
-public interface IValidationExclusion {
+import java.util.HashMap;
+import java.util.Map;
 
-    public boolean exclusionNeeded();
+public final class ValidationProcContainer {
+
+    private static Map<String, ValidationProcess> observables = new HashMap<String, ValidationProcess>();
+
+    public ValidationProcContainer INSTANCE = new ValidationProcContainer();
+
+    private ValidationProcContainer() {
+
+    }
+
+    public static void registerProc(String key, ValidationProcess value) {
+        observables.put(key, value);
+    }
+
+    public static ValidationProcess getProc(String key) {
+        return observables.get(key);
+    }
 }

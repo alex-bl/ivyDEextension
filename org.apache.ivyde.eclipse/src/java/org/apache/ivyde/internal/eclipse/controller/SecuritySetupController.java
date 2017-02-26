@@ -20,9 +20,15 @@ package org.apache.ivyde.internal.eclipse.controller;
 import org.apache.ivyde.eclipse.GUIfactoryHelper;
 import org.apache.ivyde.eclipse.IvyDEsecurityHelper;
 import org.apache.ivyde.eclipse.cp.SecuritySetup;
-import org.apache.ivyde.internal.eclipse.controller.validator.HostValidationExclusion;
-import org.apache.ivyde.internal.eclipse.controller.validator.HostValidationReaction;
+import org.apache.ivyde.internal.eclipse.controller.validator.HostRealmValidationReaction;
+import org.apache.ivyde.internal.eclipse.controller.validator.HostValidationProc;
+import org.apache.ivyde.internal.eclipse.controller.validator.IValidationReaction;
+import org.apache.ivyde.internal.eclipse.controller.validator.IdValidationExclusion;
+import org.apache.ivyde.internal.eclipse.controller.validator.IdValidationProc;
+import org.apache.ivyde.internal.eclipse.controller.validator.RealmValidationProc;
 import org.apache.ivyde.internal.eclipse.controller.validator.SecuritySetupValidatorFactory;
+import org.apache.ivyde.internal.eclipse.controller.validator.ValidationProcContainer;
+import org.apache.ivyde.internal.eclipse.controller.validator.ValidationProcess;
 import org.apache.ivyde.internal.eclipse.ui.SecuritySetupEditor;
 import org.apache.ivyde.internal.eclipse.ui.components.SecuritySetupDialog;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -30,6 +36,7 @@ import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.ValidationStatusProvider;
 import org.eclipse.core.databinding.beans.PojoProperties;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.jface.databinding.fieldassist.ControlDecorationSupport;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -38,9 +45,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Widget;
 
 public class SecuritySetupController {
 
@@ -102,9 +112,9 @@ public class SecuritySetupController {
         return new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                addOperation = false;                
+                addOperation = false;
                 addDialog.create();
-                initDialog(currentSelection);                
+                initDialog(currentSelection);
                 // initDialog(currentSelection);
                 if (addDialog.open() == Window.OK) {
                     IvyDEsecurityHelper.removeCredentials(selectionHost, selectionRealm);
@@ -160,25 +170,64 @@ public class SecuritySetupController {
         };
     }
 
-    private void createHostDataBinder(String selectedHost, boolean isAddOperation) {
-        IObservableValue textObservable = WidgetProperties.text(SWT.Modify)
-                .observe(this.addDialog.getHostText());
+    private void createHostDataBinder(String selectedHost, String selectedRealm,
+            boolean isAddOperation) {
+        IValidationReaction hostRealmValidationReaction = new HostRealmValidationReaction(
+                this.addDialog.getOkButton());
+
+        ValidationProcess hostValidationProc = new HostValidationProc(hostRealmValidationReaction);
+        ValidationProcess realmValidationProc = new RealmValidationProc(
+                hostRealmValidationReaction);
+        ValidationProcess idValidationProc = new IdValidationProc(hostRealmValidationReaction,
+                isAddOperation, selectedHost, selectedRealm);
+
+        ValidationProcContainer.registerProc("host", hostValidationProc);
+        ValidationProcContainer.registerProc("realm", realmValidationProc);
+        ValidationProcContainer.registerProc("id", idValidationProc);
+
+        IValidator hostValidator = SecuritySetupValidatorFactory.createValidator("host");
+        IValidator realmValidator = SecuritySetupValidatorFactory.createValidator("realm");
+        IValidator idValidator = SecuritySetupValidatorFactory.createValidator("id");
+
+        this.addDataBinder(this.addDialog.getHostText(), hostValidator, SecuritySetup.class, "host",
+            this.currentSelection);
+        this.addDataBinder(this.addDialog.getRealmText(), realmValidator, SecuritySetup.class,
+            "realm", this.currentSelection);
+        this.addDataBinder(this.addDialog.getIdText(), idValidator, SecuritySetup.class, "id",
+            this.currentSelection);
+    }
+
+    private void addDataBinder(Widget toObserve, IValidator validator, Class<?> observableClass,
+            String propertyName, Object observedProperty) {
+        IObservableValue textObservable = WidgetProperties.text(SWT.Modify).observe(toObserve);
         UpdateValueStrategy strategy = new UpdateValueStrategy();
-        strategy.setBeforeSetValidator(SecuritySetupValidatorFactory.createHostExistsValidator(
-            new HostValidationReaction(this.addDialog.getOkButton()),
-            new HostValidationExclusion(this.addOperation, this.selectionHost)));
+        strategy.setBeforeSetValidator(validator);
         /* with text being the port value in your model */
         ValidationStatusProvider binding = new DataBindingContext().bindValue(textObservable,
-            PojoProperties.value(SecuritySetup.class, "host").observe(this.currentSelection),
-            strategy, null);
-        ControlDecorationSupport.create(binding, SWT.TOP | SWT.LEFT);
+            PojoProperties.value(observableClass, propertyName).observe(observedProperty), strategy,
+            null);
+        ControlDecorationSupport.create(binding, SWT.LEFT);
     }
 
     private void initDialog(SecuritySetup setup) {
+        setup.setId(setup.getHost() + "@" + setup.getRealm());
+        // this.addDialog.getIdText().setText();
         this.addDialog.getHostText().setText(setup.getHost());
         this.addDialog.getRealmText().setText(setup.getRealm());
         this.addDialog.getUserNameText().setText(setup.getUserName());
-        this.addDialog.getPwdText().setText(setup.getPwd());        
-        this.createHostDataBinder(this.selectionHost, this.addOperation);
+        this.addDialog.getPwdText().setText(setup.getPwd());
+        this.createHostDataBinder(this.selectionHost, this.selectionRealm, this.addOperation);
+
+        addDialog.getHostText().addModifyListener(createModifyListener());
+        addDialog.getRealmText().addModifyListener(createModifyListener());
+    }
+
+    private ModifyListener createModifyListener() {
+        return new ModifyListener() {
+            public void modifyText(ModifyEvent e) {
+                addDialog.getIdText().setText(
+                    addDialog.getHostText().getText() + "@" + addDialog.getRealmText().getText());
+            }
+        };
     }
 }

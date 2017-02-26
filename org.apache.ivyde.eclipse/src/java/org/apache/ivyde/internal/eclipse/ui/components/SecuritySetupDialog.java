@@ -41,6 +41,8 @@ public class SecuritySetupDialog extends Dialog {
 
     public static final String TOOLTIP_PASSWORD = "The password";
 
+    private Text idText;
+    
     private Text hostText;
 
     private Text realmText;
@@ -49,6 +51,8 @@ public class SecuritySetupDialog extends Dialog {
 
     private Text pwdText;
 
+    private Label idLabel;
+    
     private Label hostLabel;
 
     private Label realmLabel;
@@ -73,6 +77,14 @@ public class SecuritySetupDialog extends Dialog {
 //        layout.marginLeft = 10;
         container.setLayout(layout);
 
+        idLabel = new Label(container, SWT.NONE);
+        idLabel.setText("Id:");
+
+        idText = new Text(container, SWT.NONE);
+        idText.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false));
+        idText.setEditable(false);
+        idText.setEnabled(false);
+        
         hostLabel = new Label(container, SWT.NONE);
         hostLabel.setText("Host:");
 
@@ -115,12 +127,14 @@ public class SecuritySetupDialog extends Dialog {
 
     @Override
     protected Point getInitialSize() {
-        return new Point(350, 240);
+        return new Point(370, 250);
     }
 
     public void setEnabled(boolean enabled) {
 
         // super.setEnabled(enabled);
+        idLabel.setEnabled(true);
+        idText.setEnabled(true);
         hostLabel.setEnabled(enabled);
         hostText.setEnabled(enabled);
         realmLabel.setEnabled(enabled);
@@ -183,6 +197,13 @@ public class SecuritySetupDialog extends Dialog {
      */
     public SecuritySetup getContentHolder() {
         return contentHolder;
+    }
+
+    /**
+     * @return the idText
+     */
+    public Text getIdText() {
+        return idText;
     }
     
     

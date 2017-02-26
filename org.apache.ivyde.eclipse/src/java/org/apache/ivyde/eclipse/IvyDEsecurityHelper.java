@@ -40,10 +40,10 @@ public final class IvyDEsecurityHelper {
 
     private static final String PASSWORD_KEY = "pwd";
 
-    private IvyDEsecurityHelper(){
-        
+    private IvyDEsecurityHelper() {
+
     }
-    
+
     public static void addCredentialsToIvyCredentialStorage(SecuritySetup setup) {
         CredentialsStore.INSTANCE.addCredentials(setup.getRealm(), setup.getHost(),
             setup.getUserName(), setup.getPwd());
@@ -60,13 +60,14 @@ public final class IvyDEsecurityHelper {
         ISecurePreferences preferences = SecurePreferencesFactory.getDefault();
         ISecurePreferences baseNode = preferences.node(IVY_DE_CREDENTIALS_BASE_NODE);
         ISecurePreferences childNode = baseNode.node(setup.getHost());
+        ISecurePreferences childChildNode = childNode.node(setup.getRealm());
 
         try {
-            childNode.put(HOST_KEY, setup.getHost(), false);
-            childNode.put(REALM_KEY, setup.getRealm(), false);
-            childNode.put(USERNAME_KEY, setup.getUserName(), true);
-            childNode.put(PASSWORD_KEY, setup.getPwd(), true);
-            childNode.flush();
+            childChildNode.put(HOST_KEY, setup.getHost(), false);
+            childChildNode.put(REALM_KEY, setup.getRealm(), false);
+            childChildNode.put(USERNAME_KEY, setup.getUserName(), true);
+            childChildNode.put(PASSWORD_KEY, setup.getPwd(), true);
+            childChildNode.flush();
         } catch (StorageException e1) {
             e1.printStackTrace();
         } catch (IOException e) {
@@ -83,12 +84,17 @@ public final class IvyDEsecurityHelper {
             String[] childNames = node.childrenNames();
             for (String childName : childNames) {
                 ISecurePreferences childNode = node.node(childName);
-                try {
-                    setupValues.add(new SecuritySetup(childNode.get(HOST_KEY, "localhost"),
-                            childNode.get(REALM_KEY, "basic"), childNode.get(USERNAME_KEY, null),
-                            childNode.get(PASSWORD_KEY, null)));
-                } catch (StorageException e1) {
-                    e1.printStackTrace();
+                String[] childChildNames = childNode.childrenNames();
+                for (String childChildName : childChildNames) {
+                    ISecurePreferences childChildNode = childNode.node(childChildName);
+                    try {
+                        setupValues.add(new SecuritySetup(childChildNode.get(HOST_KEY, "localhost"),
+                                childChildNode.get(REALM_KEY, "basic"),
+                                childChildNode.get(USERNAME_KEY, null),
+                                childChildNode.get(PASSWORD_KEY, null)));
+                    } catch (StorageException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
         }
@@ -97,32 +103,38 @@ public final class IvyDEsecurityHelper {
     }
 
     public static void removeCredentials(String host, String realm) {
-        removeCredentialsFromSecureStore(host);
+        removeCredentialsFromSecureStore(host, realm);
         invalidateIvyCredentials(host, realm);
     }
 
-    public static boolean hostExistsInSecureStorage(String host) {
+    public static boolean hostExistsInSecureStorage(String host, String realm) {
         ISecurePreferences preferences = SecurePreferencesFactory.getDefault();
         if (preferences.nodeExists(IVY_DE_CREDENTIALS_BASE_NODE)) {
             ISecurePreferences node = preferences.node(IVY_DE_CREDENTIALS_BASE_NODE);
             if (node.nodeExists(host)) {
-                return true;
+                ISecurePreferences childNode = node.node(host);
+                if (childNode.nodeExists(realm)) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    private static void removeCredentialsFromSecureStore(String host) {
+    private static void removeCredentialsFromSecureStore(String host, String realm) {
         ISecurePreferences preferences = SecurePreferencesFactory.getDefault();
         if (preferences.nodeExists(IVY_DE_CREDENTIALS_BASE_NODE)) {
             ISecurePreferences node = preferences.node(IVY_DE_CREDENTIALS_BASE_NODE);
             if (node.nodeExists(host)) {
-                node.node(host).removeNode();
-                try {
-                    node.flush();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                ISecurePreferences childNode = node.node(host);
+                if (childNode.nodeExists(realm)) {
+                    childNode.node(realm).removeNode();
+                    try {
+                        node.flush();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
             }
         }

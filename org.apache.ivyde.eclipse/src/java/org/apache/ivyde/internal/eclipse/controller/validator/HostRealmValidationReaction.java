@@ -17,7 +17,28 @@
  */
 package org.apache.ivyde.internal.eclipse.controller.validator;
 
-public interface IValidationExclusion {
+import org.eclipse.swt.widgets.Button;
 
-    public boolean exclusionNeeded();
+public class HostRealmValidationReaction implements IValidationReaction {
+
+    private Button okButton;
+
+    /**
+     * @param editButton
+     * @param delButton
+     */
+    public HostRealmValidationReaction(Button okButton) {
+        this.okButton = okButton;
+    }
+
+    @Override
+    public void ok() {
+        this.okButton.setEnabled(true);
+    }
+
+    @Override
+    public void error() {
+        this.okButton.setEnabled(false);
+    }
+
 }
