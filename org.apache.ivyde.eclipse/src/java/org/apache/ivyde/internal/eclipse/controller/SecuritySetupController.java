@@ -202,7 +202,7 @@ public class SecuritySetupController {
         IObservableValue textObservable = WidgetProperties.text(SWT.Modify).observe(toObserve);
         UpdateValueStrategy strategy = new UpdateValueStrategy();
         strategy.setBeforeSetValidator(validator);
-        /* with text being the port value in your model */
+
         ValidationStatusProvider binding = new DataBindingContext().bindValue(textObservable,
             PojoProperties.value(observableClass, propertyName).observe(observedProperty), strategy,
             null);
