@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.apache.ivy.util.url.CredentialsStore;
 import org.apache.ivyde.eclipse.cp.SecuritySetup;
+import org.apache.ivyde.internal.eclipse.IvyPlugin;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
@@ -69,10 +71,9 @@ public final class IvyDEsecurityHelper {
             childChildNode.put(PASSWORD_KEY, setup.getPwd(), true);
             childChildNode.flush();
         } catch (StorageException e1) {
-            e1.printStackTrace();
+            IvyPlugin.logError(e1.getMessage(), e1);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            IvyPlugin.logError(e.getMessage(), e);
         }
     }
 
@@ -93,7 +94,7 @@ public final class IvyDEsecurityHelper {
                                 childChildNode.get(USERNAME_KEY, null),
                                 childChildNode.get(PASSWORD_KEY, null)));
                     } catch (StorageException e1) {
-                        e1.printStackTrace();
+                        IvyPlugin.logError(e1.getMessage(), e1);
                     }
                 }
             }
@@ -133,7 +134,7 @@ public final class IvyDEsecurityHelper {
                         node.flush();
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        IvyPlugin.logError(e.getMessage(), e);
                     }
                 }
             }
