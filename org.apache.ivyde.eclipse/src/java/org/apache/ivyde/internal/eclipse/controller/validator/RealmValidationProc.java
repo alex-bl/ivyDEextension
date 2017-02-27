@@ -29,7 +29,7 @@ public class RealmValidationProc extends ValidationProcess {
     @Override
     public boolean doValidate(Object toValidate) {
         String realm = (String) toValidate;
-        super.setErrorMessage(EMPTY_ERROR);
+        super.setErrorMessage(EMPTY_ERROR.replace("$entry", "Realm"));
         return !realm.equals("");
     }
 }

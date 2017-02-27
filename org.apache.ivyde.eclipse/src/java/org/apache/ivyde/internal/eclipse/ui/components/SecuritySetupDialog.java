@@ -20,6 +20,8 @@ package org.apache.ivyde.internal.eclipse.ui.components;
 import org.apache.ivyde.eclipse.cp.SecuritySetup;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -60,6 +62,10 @@ public class SecuritySetupDialog extends Dialog {
     private Label userNameLabel;
 
     private Label pwdLabel;
+    
+    private Label errorLabel;
+    
+    private Label errorIcon;
 
     //needed here: otherwise disposed
     private SecuritySetup contentHolder;
@@ -71,12 +77,28 @@ public class SecuritySetupDialog extends Dialog {
 
     @Override
     protected Control createDialogArea(Composite parent) {
+
+        Composite errorContainer = (Composite) super.createDialogArea(parent);
+        GridLayout errorLayout = new GridLayout(2, false);
+        errorContainer.setLayout(errorLayout);
+        
+        errorIcon = new Label(errorContainer, SWT.NONE);
+        errorIcon.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_ERROR));
+        //errorIcon.setLayoutData(new GridData(20,20));
+        
+        errorLabel = new Label(errorContainer, SWT.NONE);
+        errorLabel.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false));
+
+        Label separator = new Label(errorContainer, SWT.HORIZONTAL | SWT.SEPARATOR);
+        separator.setLayoutData(new GridData(GridData.FILL,GridData.BEGINNING,true, false,2,1));
+        
         Composite container = (Composite) super.createDialogArea(parent);
         GridLayout layout = new GridLayout(2, false);
 //        layout.marginRight = 5;
 //        layout.marginLeft = 10;
         container.setLayout(layout);
-
+        
+        
         idLabel = new Label(container, SWT.NONE);
         idLabel.setText("Id:");
 
@@ -113,7 +135,7 @@ public class SecuritySetupDialog extends Dialog {
         pwdText = new Text(container, SWT.PASSWORD | SWT.BORDER);
         pwdText.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
         pwdText.setToolTipText(TOOLTIP_PASSWORD);
-
+                       
         return container;
     }
 
@@ -127,7 +149,7 @@ public class SecuritySetupDialog extends Dialog {
 
     @Override
     protected Point getInitialSize() {
-        return new Point(370, 250);
+        return new Point(370, 280);
     }
 
     public void setEnabled(boolean enabled) {
@@ -143,6 +165,9 @@ public class SecuritySetupDialog extends Dialog {
         userNameText.setEnabled(enabled);
         pwdLabel.setEnabled(enabled);
         pwdText.setEnabled(enabled);
+        
+        errorIcon.setEnabled(true);
+        errorLabel.setEnabled(true);
 
     }
 
@@ -205,6 +230,21 @@ public class SecuritySetupDialog extends Dialog {
     public Text getIdText() {
         return idText;
     }
-    
+
+    /**
+     * @return the errorLabel
+     */
+    public Label getErrorLabel() {
+        return errorLabel;
+    }
+
+    /**
+     * @return the errorIcon
+     */
+    public Label getErrorIcon() {
+        return errorIcon;
+    }
+
+
     
 }

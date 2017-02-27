@@ -25,7 +25,9 @@ public abstract class ValidationProcess {
 
     private String errorMessage;
     
-    public static final String EMPTY_ERROR = "Entry cannot be empty";
+    private String okMessage;
+    
+    public static final String EMPTY_ERROR = "The property '$entry' cannot be empty";
 
     public static final String EXISTING_ENTRY_ERROR = "An entry with that host and realm already exists";
 
@@ -44,6 +46,20 @@ public abstract class ValidationProcess {
      */
     public IValidationExclusion getExclusion() {
         return exclusion;
+    }
+
+    /**
+     * @return the okMessage
+     */
+    public String getOkMessage() {
+        return okMessage;
+    }
+
+    /**
+     * @param okMessage the okMessage to set
+     */
+    public void setOkMessage(String okMessage) {
+        this.okMessage = okMessage;
     }
 
     /**

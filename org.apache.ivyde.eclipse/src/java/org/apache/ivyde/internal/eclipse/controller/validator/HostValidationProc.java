@@ -30,7 +30,7 @@ public class HostValidationProc extends ValidationProcess {
     @Override
     public boolean doValidate(Object toValidate) {
         String host = (String) toValidate;
-        super.setErrorMessage(EMPTY_ERROR);
+        super.setErrorMessage(EMPTY_ERROR.replace("$entry", "Host"));
         return !host.equals("");
     }
 }

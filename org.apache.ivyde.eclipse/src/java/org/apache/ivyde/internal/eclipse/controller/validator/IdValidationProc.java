@@ -46,25 +46,26 @@ public class IdValidationProc extends ValidationProcess {
     public boolean doValidate(Object toValidate) {
         String id = (String) toValidate;
         if (id.equals("@")) {
-            super.setErrorMessage("Host and realm cannot be empty");
+            super.setErrorMessage("Properties 'Host' and 'Realm' cannot be empty");
             return false;
         }
         if (id.indexOf("@") == 0) {
-            super.setErrorMessage("Host cannot be empty");
+            super.setErrorMessage(EMPTY_ERROR.replace("$entry", "Host"));
             return false;
         }
         if (id.indexOf("@") == id.length() - 1) {
-            super.setErrorMessage("Realm cannot be empty");
+            super.setErrorMessage(EMPTY_ERROR.replace("$entry", "Realm"));
             return false;
         }
         String[] hostRealm = id.split("@");
         IValidationExclusion exclusion = new IdValidationExclusion(isAddOperation, prevHostVal,
                 hostRealm[0], prevRealmVal, hostRealm[1]);
+        super.setOkMessage("Valid id: "+id);
         if (exclusion.exclusionNeeded()) {
             return true;
         }
         if (IvyDEsecurityHelper.hostExistsInSecureStorage(hostRealm[0], hostRealm[1])) {
-            super.setErrorMessage("Id already exists");
+            super.setErrorMessage(EXISTING_ENTRY_ERROR);
             return false;
         }
         return true;

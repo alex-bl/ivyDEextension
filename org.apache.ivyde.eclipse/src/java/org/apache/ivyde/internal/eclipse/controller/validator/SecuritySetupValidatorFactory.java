@@ -26,8 +26,8 @@ public final class SecuritySetupValidatorFactory {
     private SecuritySetupValidatorFactory() {
 
     }
-
-    public static IValidator createValidator(final String validationProcId) {
+//using info to be able to send a message...
+    public static IValidator createValidator(final String validationProcId, final boolean useOk) {
         return new IValidator() {
             @Override
             public IStatus validate(Object value) {
@@ -38,7 +38,7 @@ public final class SecuritySetupValidatorFactory {
                     return ValidationStatus.error(validation.getErrorMessage());
                 }
                 reaction.ok();
-                return ValidationStatus.ok();
+                return useOk ? ValidationStatus.ok() : ValidationStatus.info(validation.getOkMessage());
             }
         };
     }

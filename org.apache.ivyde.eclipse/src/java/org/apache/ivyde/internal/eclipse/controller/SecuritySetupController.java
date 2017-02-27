@@ -31,6 +31,7 @@ import org.apache.ivyde.internal.eclipse.controller.validator.ValidationProcCont
 import org.apache.ivyde.internal.eclipse.controller.validator.ValidationProcess;
 import org.apache.ivyde.internal.eclipse.ui.SecuritySetupEditor;
 import org.apache.ivyde.internal.eclipse.ui.components.SecuritySetupDialog;
+import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.ValidationStatusProvider;
@@ -50,6 +51,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Widget;
 
 public class SecuritySetupController {
@@ -67,6 +69,8 @@ public class SecuritySetupController {
     private String selectionRealm;
 
     private boolean addOperation = true;
+    
+    private DataBindingContext ctx = new DataBindingContext();
 
     /**
      * @param setupEditorGUI
@@ -173,7 +177,7 @@ public class SecuritySetupController {
     private void createHostDataBinder(String selectedHost, String selectedRealm,
             boolean isAddOperation) {
         IValidationReaction hostRealmValidationReaction = new HostRealmValidationReaction(
-                this.addDialog.getOkButton());
+                this.addDialog.getOkButton(), this.addDialog.getErrorLabel(), this.addDialog.getErrorIcon());
 
         ValidationProcess hostValidationProc = new HostValidationProc(hostRealmValidationReaction);
         ValidationProcess realmValidationProc = new RealmValidationProc(
@@ -185,28 +189,37 @@ public class SecuritySetupController {
         ValidationProcContainer.registerProc("realm", realmValidationProc);
         ValidationProcContainer.registerProc("id", idValidationProc);
 
-        IValidator hostValidator = SecuritySetupValidatorFactory.createValidator("host");
-        IValidator realmValidator = SecuritySetupValidatorFactory.createValidator("realm");
-        IValidator idValidator = SecuritySetupValidatorFactory.createValidator("id");
+        IValidator hostValidator = SecuritySetupValidatorFactory.createValidator("host", true);
+        IValidator realmValidator = SecuritySetupValidatorFactory.createValidator("realm", true);
+        IValidator idValidator = SecuritySetupValidatorFactory.createValidator("id", false);
 
-        this.addDataBinder(this.addDialog.getHostText(), hostValidator, SecuritySetup.class, "host",
-            this.currentSelection);
-        this.addDataBinder(this.addDialog.getRealmText(), realmValidator, SecuritySetup.class,
-            "realm", this.currentSelection);
         this.addDataBinder(this.addDialog.getIdText(), idValidator, SecuritySetup.class, "id",
-            this.currentSelection);
+            this.currentSelection, true);
+        this.addDataBinder(this.addDialog.getHostText(), hostValidator, SecuritySetup.class, "host",
+            this.currentSelection, true);
+        this.addDataBinder(this.addDialog.getRealmText(), realmValidator, SecuritySetup.class,
+            "realm", this.currentSelection, true);
     }
 
     private void addDataBinder(Widget toObserve, IValidator validator, Class<?> observableClass,
-            String propertyName, Object observedProperty) {
+            String propertyName, Object observedProperty, boolean textDecorationEnabled) {
         IObservableValue textObservable = WidgetProperties.text(SWT.Modify).observe(toObserve);
         UpdateValueStrategy strategy = new UpdateValueStrategy();
         strategy.setBeforeSetValidator(validator);
 
-        ValidationStatusProvider binding = new DataBindingContext().bindValue(textObservable,
+        ValidationStatusProvider binding = this.ctx.bindValue(textObservable,
             PojoProperties.value(observableClass, propertyName).observe(observedProperty), strategy,
             null);
-        ControlDecorationSupport.create(binding, SWT.LEFT);
+        if(textDecorationEnabled){
+            ControlDecorationSupport.create(binding, SWT.LEFT);
+        }
+        final IObservableValue errorObservable = WidgetProperties.text()
+                .observe(this.addDialog.getErrorLabel());
+        
+        ctx.bindValue(errorObservable,
+            new AggregateValidationStatus(ctx.getBindings(),
+                            AggregateValidationStatus.MAX_SEVERITY), null, null);
+        
     }
 
     private void initDialog(SecuritySetup setup) {

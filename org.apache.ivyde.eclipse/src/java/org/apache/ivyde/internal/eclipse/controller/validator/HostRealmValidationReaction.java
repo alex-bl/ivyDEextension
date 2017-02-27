@@ -17,28 +17,41 @@
  */
 package org.apache.ivyde.internal.eclipse.controller.validator;
 
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Label;
 
 public class HostRealmValidationReaction implements IValidationReaction {
 
     private Button okButton;
-
-    /**
-     * @param editButton
-     * @param delButton
-     */
-    public HostRealmValidationReaction(Button okButton) {
-        this.okButton = okButton;
-    }
+    private Label errorLabel;
+    private Label errorIcon;
 
     @Override
     public void ok() {
         this.okButton.setEnabled(true);
+//        this.errorIcon.setVisible(false);
+//        this.errorLabel.setVisible(false);
+        this.errorIcon.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_INFO));        
+    }
+
+    /**
+     * @param okButton
+     * @param errorLabel
+     * @param errorIcon
+     */
+    public HostRealmValidationReaction(Button okButton, Label errorLabel, Label errorIcon) {
+        this.okButton = okButton;
+        this.errorLabel = errorLabel;
+        this.errorIcon = errorIcon;
     }
 
     @Override
     public void error() {
         this.okButton.setEnabled(false);
+        this.errorIcon.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_ERROR));
+        //this.errorLabel.setText("Insert credentials");
     }
 
 }
