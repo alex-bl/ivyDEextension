@@ -60,7 +60,7 @@ public class IdValidationProc extends ValidationProcess {
         String[] hostRealm = id.split("@");
         IValidationExclusion exclusion = new IdValidationExclusion(isAddOperation, prevHostVal,
                 hostRealm[0], prevRealmVal, hostRealm[1]);
-        super.setOkMessage("Valid id: "+id);
+        super.setOkMessage("Valid ivy credentials: Press 'OK' to save them");
         if (exclusion.exclusionNeeded()) {
             return true;
         }
