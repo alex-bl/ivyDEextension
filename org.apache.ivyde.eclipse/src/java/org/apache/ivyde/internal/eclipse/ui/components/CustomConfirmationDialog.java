@@ -27,8 +27,8 @@ public class CustomConfirmationDialog extends MessageDialog{
     public CustomConfirmationDialog(Shell parentShell, String dialogTitle, Image dialogTitleImage,
             String dialogMessage, int dialogImageType, int defaultIndex,
             String[] dialogButtonLabels) {
-        super(parentShell, dialogTitle, dialogTitleImage, dialogMessage, dialogImageType, defaultIndex,
-                dialogButtonLabels);
+        super(parentShell, dialogTitle, dialogTitleImage, dialogMessage, dialogImageType, dialogButtonLabels,
+                defaultIndex);
     }
     
     public CustomConfirmationDialog(Shell parentShell, String dialogTitle, String dialogMessage){
