@@ -23,7 +23,6 @@ import org.apache.ivyde.eclipse.cp.SecuritySetup;
 import org.apache.ivyde.internal.eclipse.controller.validator.HostRealmValidationReaction;
 import org.apache.ivyde.internal.eclipse.controller.validator.HostValidationProc;
 import org.apache.ivyde.internal.eclipse.controller.validator.IValidationReaction;
-import org.apache.ivyde.internal.eclipse.controller.validator.IdValidationExclusion;
 import org.apache.ivyde.internal.eclipse.controller.validator.IdValidationProc;
 import org.apache.ivyde.internal.eclipse.controller.validator.RealmValidationProc;
 import org.apache.ivyde.internal.eclipse.controller.validator.SecuritySetupValidatorFactory;
@@ -51,7 +50,6 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Widget;
 
 public class SecuritySetupController {
@@ -121,7 +119,9 @@ public class SecuritySetupController {
                 initDialog(currentSelection);
                 // initDialog(currentSelection);
                 if (addDialog.open() == Window.OK) {
-                    IvyDEsecurityHelper.removeCredentials(selectionHost, selectionRealm);
+                    currentSelection.setHost(selectionHost);
+                    currentSelection.setRealm(selectionRealm);
+                    IvyDEsecurityHelper.removeCredentials(currentSelection);
                     IvyDEsecurityHelper.addCredentialsToSecureStorage(addDialog.getContentHolder());
                     IvyDEsecurityHelper
                             .addCredentialsToIvyCredentialStorage(addDialog.getContentHolder());
@@ -146,7 +146,9 @@ public class SecuritySetupController {
                     setupEditorGUI.getShell(), "Confirmation",
                     "Remove selected credentials from secure storage?");
                 if (confirmationDialog.open() == 0) {
-                    IvyDEsecurityHelper.removeCredentials(selectionHost, selectionRealm);
+                    currentSelection.setHost(selectionHost);
+                    currentSelection.setRealm(selectionRealm);
+                    IvyDEsecurityHelper.removeCredentials(currentSelection);
                     setupEditorGUI.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());
                     setupEditorGUI.getEditBtn().setEnabled(false);
                     setupEditorGUI.getDeleteBtn().setEnabled(false);

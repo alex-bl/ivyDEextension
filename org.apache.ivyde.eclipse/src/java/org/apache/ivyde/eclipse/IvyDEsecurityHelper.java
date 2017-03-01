@@ -25,7 +25,6 @@ import java.util.List;
 import org.apache.ivy.util.url.CredentialsStore;
 import org.apache.ivyde.eclipse.cp.SecuritySetup;
 import org.apache.ivyde.internal.eclipse.IvyPlugin;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
@@ -49,12 +48,15 @@ public final class IvyDEsecurityHelper {
     public static void addCredentialsToIvyCredentialStorage(SecuritySetup setup) {
         CredentialsStore.INSTANCE.addCredentials(setup.getRealm(), setup.getHost(),
             setup.getUserName(), setup.getPwd());
+        IvyPlugin.logInfo("Credentials " + setup.toString() + " added to ivyDE credential store");
     }
 
     public static void cpyCredentialsFromSecureToIvyStorage() {
         List<SecuritySetup> credentials = getCredentialsFromSecureStore();
         for (SecuritySetup entry : credentials) {
             addCredentialsToIvyCredentialStorage(entry);
+            IvyPlugin.logInfo("Credentials " + entry.toString()
+                    + " from eclipse secure storage copied to ivyDE credential store");
         }
     }
 
@@ -70,6 +72,8 @@ public final class IvyDEsecurityHelper {
             childChildNode.put(USERNAME_KEY, setup.getUserName(), true);
             childChildNode.put(PASSWORD_KEY, setup.getPwd(), true);
             childChildNode.flush();
+            IvyPlugin.logInfo("Credentials " + setup.toString()
+                    + " added to eclipse secure storage");
         } catch (StorageException e1) {
             IvyPlugin.logError(e1.getMessage(), e1);
         } catch (IOException e) {
@@ -89,9 +93,9 @@ public final class IvyDEsecurityHelper {
                 for (String childChildName : childChildNames) {
                     ISecurePreferences childChildNode = childNode.node(childChildName);
                     try {
-                        setupValues.add(new SecuritySetup(childChildNode.get(HOST_KEY, "localhost"),
-                                childChildNode.get(REALM_KEY, "basic"),
-                                childChildNode.get(USERNAME_KEY, null),
+                        setupValues.add(new SecuritySetup(
+                                childChildNode.get(HOST_KEY, "localhost"), childChildNode.get(
+                                    REALM_KEY, "basic"), childChildNode.get(USERNAME_KEY, null),
                                 childChildNode.get(PASSWORD_KEY, null)));
                     } catch (StorageException e1) {
                         IvyPlugin.logError(e1.getMessage(), e1);
@@ -103,9 +107,9 @@ public final class IvyDEsecurityHelper {
         return setupValues;
     }
 
-    public static void removeCredentials(String host, String realm) {
-        removeCredentialsFromSecureStore(host, realm);
-        invalidateIvyCredentials(host, realm);
+    public static void removeCredentials(SecuritySetup setup) {
+        removeCredentialsFromSecureStore(setup);
+        invalidateIvyCredentials(setup);
     }
 
     public static boolean hostExistsInSecureStorage(String host, String realm) {
@@ -122,7 +126,9 @@ public final class IvyDEsecurityHelper {
         return false;
     }
 
-    private static void removeCredentialsFromSecureStore(String host, String realm) {
+    private static void removeCredentialsFromSecureStore(SecuritySetup setup) {
+        String host = setup.getHost();
+        String realm = setup.getRealm();
         ISecurePreferences preferences = SecurePreferencesFactory.getDefault();
         if (preferences.nodeExists(IVY_DE_CREDENTIALS_BASE_NODE)) {
             ISecurePreferences node = preferences.node(IVY_DE_CREDENTIALS_BASE_NODE);
@@ -132,6 +138,8 @@ public final class IvyDEsecurityHelper {
                     childNode.node(realm).removeNode();
                     try {
                         node.flush();
+                        IvyPlugin.logInfo("Credentials " + setup.toString()
+                                + "' removed from eclipse secure storage");
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
                         IvyPlugin.logError(e.getMessage(), e);
@@ -141,9 +149,11 @@ public final class IvyDEsecurityHelper {
         }
     }
 
-    private static void invalidateIvyCredentials(String host, String realm) {
+    private static void invalidateIvyCredentials(SecuritySetup setup) {
         // need to invalidate => on credentialStore just add-ops allowed
-        CredentialsStore.INSTANCE.addCredentials(host, realm, null, null);
+        CredentialsStore.INSTANCE.addCredentials(setup.getHost(), setup.getRealm(), null, null);
+        IvyPlugin.logInfo("Credentials " + setup
+                + " invalidated on ivy credential store: Removed on next eclipse startup.");
     }
 
     public static boolean credentialsInSecureStorage() {

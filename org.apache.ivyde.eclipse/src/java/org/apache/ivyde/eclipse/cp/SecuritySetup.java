@@ -29,10 +29,10 @@ public class SecuritySetup implements Comparable<SecuritySetup> {
 
     private String pwd = "";
 
-    public SecuritySetup(){
-        
+    public SecuritySetup() {
+
     }
-    
+
     /**
      * @param host
      * @param realm
@@ -164,10 +164,9 @@ public class SecuritySetup implements Comparable<SecuritySetup> {
 
     @Override
     public String toString() {
-        return "[host='" + this.host + ", realm='" + this.realm + "' user='" + this.userName
-                + "' pwd='" + this.pwd + "']";
+        return "[storageId: '" + this.host + "@" + this.realm + "', host='" + this.host + ", realm='"
+                + this.realm + "', user='" + this.userName + ", password=******']";
     }
-
 
     public int compareTo(SecuritySetup o) {
         return this.host.compareTo(o.getHost());
