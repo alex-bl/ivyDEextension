@@ -15,14 +15,15 @@
  *  limitations under the License.
  *
  */
-package org.apache.ivyde.internal.eclipse.controller.validator;
+package org.apache.ivyde.internal.eclipse.validator.reaction;
 
+import org.apache.ivyde.internal.eclipse.validator.IValidationReaction;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Label;
 
-public class HostRealmValidationReaction implements IValidationReaction {
+public class GeneralValidationReaction implements IValidationReaction {
 
     private Button okButton;
     private Label errorLabel;
@@ -41,7 +42,7 @@ public class HostRealmValidationReaction implements IValidationReaction {
      * @param errorLabel
      * @param errorIcon
      */
-    public HostRealmValidationReaction(Button okButton, Label errorLabel, Label errorIcon) {
+    public GeneralValidationReaction(Button okButton, Label errorLabel, Label errorIcon) {
         this.okButton = okButton;
         this.errorLabel = errorLabel;
         this.errorIcon = errorIcon;

@@ -40,6 +40,7 @@ public class SecuritySetup implements Comparable<SecuritySetup> {
      * @param pwd
      */
     public SecuritySetup(String host, String realm, String userName, String pwd) {
+        this.id=host+"@"+realm;
         this.host = host;
         this.realm = realm;
         this.userName = userName;

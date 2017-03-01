@@ -20,16 +20,17 @@ package org.apache.ivyde.internal.eclipse.controller;
 import org.apache.ivyde.eclipse.GUIfactoryHelper;
 import org.apache.ivyde.eclipse.IvyDEsecurityHelper;
 import org.apache.ivyde.eclipse.cp.SecuritySetup;
-import org.apache.ivyde.internal.eclipse.controller.validator.HostRealmValidationReaction;
-import org.apache.ivyde.internal.eclipse.controller.validator.HostValidationProc;
-import org.apache.ivyde.internal.eclipse.controller.validator.IValidationReaction;
-import org.apache.ivyde.internal.eclipse.controller.validator.IdValidationProc;
-import org.apache.ivyde.internal.eclipse.controller.validator.RealmValidationProc;
-import org.apache.ivyde.internal.eclipse.controller.validator.SecuritySetupValidatorFactory;
-import org.apache.ivyde.internal.eclipse.controller.validator.ValidationProcContainer;
-import org.apache.ivyde.internal.eclipse.controller.validator.ValidationProcess;
 import org.apache.ivyde.internal.eclipse.ui.SecuritySetupEditor;
 import org.apache.ivyde.internal.eclipse.ui.components.SecuritySetupDialog;
+import org.apache.ivyde.internal.eclipse.validator.BaseValidator;
+import org.apache.ivyde.internal.eclipse.validator.IValidationReaction;
+import org.apache.ivyde.internal.eclipse.validator.impl.HostValidator;
+import org.apache.ivyde.internal.eclipse.validator.impl.IdValidator;
+import org.apache.ivyde.internal.eclipse.validator.impl.PasswordValidator;
+import org.apache.ivyde.internal.eclipse.validator.impl.RealmValidator;
+import org.apache.ivyde.internal.eclipse.validator.impl.UserNameValidator;
+import org.apache.ivyde.internal.eclipse.validator.reaction.GeneralValidationReaction;
+import org.apache.ivyde.internal.eclipse.validator.reaction.NopValidationReaction;
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -66,8 +67,10 @@ public class SecuritySetupController {
 
     private String selectionRealm;
 
+    private String selectionUserName;
+
     private boolean addOperation = true;
-    
+
     private DataBindingContext ctx = new DataBindingContext();
 
     /**
@@ -76,15 +79,15 @@ public class SecuritySetupController {
      */
     public SecuritySetupController(SecuritySetupEditor setupEditorGUI) {
         this.setupEditorGUI = setupEditorGUI;
-        addDialog = new SecuritySetupDialog(setupEditorGUI.getShell(), currentSelection);
+        addDialog = new SecuritySetupDialog(setupEditorGUI.getShell());
     }
 
     public void addHandlers() {
         setupEditorGUI.getAddBtn().addSelectionListener(this.createAddBtnSelectionAdapter());
         setupEditorGUI.getEditBtn().addSelectionListener(this.createEditBtnSelectionAdapter());
         setupEditorGUI.getDeleteBtn().addSelectionListener(this.createDelBtnSelectionAdapter());
-        setupEditorGUI.getTableViewer()
-                .addSelectionChangedListener(this.createSelectionChangedListener());
+        setupEditorGUI.getTableViewer().addSelectionChangedListener(
+            this.createSelectionChangedListener());
     }
 
     private SelectionListener createAddBtnSelectionAdapter() {
@@ -94,11 +97,10 @@ public class SecuritySetupController {
                 addOperation = true;
                 currentSelection = new SecuritySetup();
                 addDialog.create();
-                initDialog(currentSelection);
+                initDialog();
                 if (addDialog.open() == Window.OK) {
-                    IvyDEsecurityHelper.addCredentialsToSecureStorage(addDialog.getContentHolder());
-                    IvyDEsecurityHelper
-                            .addCredentialsToIvyCredentialStorage(addDialog.getContentHolder());
+                    IvyDEsecurityHelper.addCredentialsToSecureStorage(currentSelection);
+                    IvyDEsecurityHelper.addCredentialsToIvyCredentialStorage(currentSelection);
                     // TODO: using init to reload directly from secure storage or use an
                     // intermediate-container?
                     setupEditorGUI.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());
@@ -116,15 +118,13 @@ public class SecuritySetupController {
             public void widgetSelected(SelectionEvent e) {
                 addOperation = false;
                 addDialog.create();
-                initDialog(currentSelection);
+                initDialog();
                 // initDialog(currentSelection);
                 if (addDialog.open() == Window.OK) {
-                    currentSelection.setHost(selectionHost);
-                    currentSelection.setRealm(selectionRealm);
-                    IvyDEsecurityHelper.removeCredentials(currentSelection);
-                    IvyDEsecurityHelper.addCredentialsToSecureStorage(addDialog.getContentHolder());
-                    IvyDEsecurityHelper
-                            .addCredentialsToIvyCredentialStorage(addDialog.getContentHolder());
+                    IvyDEsecurityHelper.removeCredentials(new SecuritySetup(selectionHost,
+                            selectionRealm, selectionUserName, ""));
+                    IvyDEsecurityHelper.addCredentialsToSecureStorage(currentSelection);
+                    IvyDEsecurityHelper.addCredentialsToIvyCredentialStorage(currentSelection);
                     // TODO: using init to reload directly from secure storage or use an
                     // intermediate-container?
                     setupEditorGUI.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());
@@ -148,7 +148,8 @@ public class SecuritySetupController {
                 if (confirmationDialog.open() == 0) {
                     currentSelection.setHost(selectionHost);
                     currentSelection.setRealm(selectionRealm);
-                    IvyDEsecurityHelper.removeCredentials(currentSelection);
+                    IvyDEsecurityHelper.removeCredentials(new SecuritySetup(selectionHost,
+                            selectionRealm, selectionUserName, ""));
                     setupEditorGUI.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());
                     setupEditorGUI.getEditBtn().setEnabled(false);
                     setupEditorGUI.getDeleteBtn().setEnabled(false);
@@ -169,6 +170,7 @@ public class SecuritySetupController {
                 if (currentSelection != null) {
                     selectionHost = currentSelection.getHost();
                     selectionRealm = currentSelection.getRealm();
+                    selectionUserName = currentSelection.getUserName();
                 } else {
                     currentSelection = new SecuritySetup();
                 }
@@ -178,29 +180,28 @@ public class SecuritySetupController {
 
     private void createHostDataBinder(String selectedHost, String selectedRealm,
             boolean isAddOperation) {
-        IValidationReaction hostRealmValidationReaction = new HostRealmValidationReaction(
-                this.addDialog.getOkButton(), this.addDialog.getErrorLabel(), this.addDialog.getErrorIcon());
+        IValidationReaction generalValidationReaction = new GeneralValidationReaction(
+                this.addDialog.getOkButton(), this.addDialog.getErrorLabel(),
+                this.addDialog.getErrorIcon());
+        IValidationReaction nopValidationReaction = new NopValidationReaction();
 
-        ValidationProcess hostValidationProc = new HostValidationProc(hostRealmValidationReaction);
-        ValidationProcess realmValidationProc = new RealmValidationProc(
-                hostRealmValidationReaction);
-        ValidationProcess idValidationProc = new IdValidationProc(hostRealmValidationReaction,
-                isAddOperation, selectedHost, selectedRealm);
-
-        ValidationProcContainer.registerProc("host", hostValidationProc);
-        ValidationProcContainer.registerProc("realm", realmValidationProc);
-        ValidationProcContainer.registerProc("id", idValidationProc);
-
-        IValidator hostValidator = SecuritySetupValidatorFactory.createValidator("host", true);
-        IValidator realmValidator = SecuritySetupValidatorFactory.createValidator("realm", true);
-        IValidator idValidator = SecuritySetupValidatorFactory.createValidator("id", false);
+        BaseValidator hostValidator = new HostValidator(generalValidationReaction);
+        BaseValidator realmValidator = new RealmValidator(generalValidationReaction);
+        BaseValidator idValidator = new IdValidator(generalValidationReaction, isAddOperation,
+                selectedHost, selectedRealm);
+        BaseValidator userNameValidator = new UserNameValidator(nopValidationReaction);
+        BaseValidator passwordValidator = new PasswordValidator(nopValidationReaction);
 
         this.addDataBinder(this.addDialog.getIdText(), idValidator, SecuritySetup.class, "id",
             this.currentSelection, true);
-        this.addDataBinder(this.addDialog.getHostText(), hostValidator, SecuritySetup.class, "host",
-            this.currentSelection, true);
+        this.addDataBinder(this.addDialog.getHostText(), hostValidator, SecuritySetup.class,
+            "host", this.currentSelection, true);
         this.addDataBinder(this.addDialog.getRealmText(), realmValidator, SecuritySetup.class,
             "realm", this.currentSelection, true);
+        this.addDataBinder(this.addDialog.getUserNameText(), userNameValidator,
+            SecuritySetup.class, "userName", this.currentSelection, true);
+        this.addDataBinder(this.addDialog.getPwdText(), passwordValidator, SecuritySetup.class,
+            "pwd", this.currentSelection, true);
     }
 
     private void addDataBinder(Widget toObserve, IValidator validator, Class<?> observableClass,
@@ -210,27 +211,20 @@ public class SecuritySetupController {
         strategy.setBeforeSetValidator(validator);
 
         ValidationStatusProvider binding = this.ctx.bindValue(textObservable,
-            PojoProperties.value(observableClass, propertyName).observe(observedProperty), strategy,
-            null);
-        if(textDecorationEnabled){
+            PojoProperties.value(observableClass, propertyName).observe(observedProperty),
+            strategy, null);
+        if (textDecorationEnabled) {
             ControlDecorationSupport.create(binding, SWT.LEFT);
         }
-        final IObservableValue errorObservable = WidgetProperties.text()
-                .observe(this.addDialog.getErrorLabel());
-        
-        ctx.bindValue(errorObservable,
-            new AggregateValidationStatus(ctx.getBindings(),
-                            AggregateValidationStatus.MAX_SEVERITY), null, null);
-        
+        final IObservableValue errorObservable = WidgetProperties.text().observe(
+            this.addDialog.getErrorLabel());
+
+        ctx.bindValue(errorObservable, new AggregateValidationStatus(ctx.getBindings(),
+                AggregateValidationStatus.MAX_SEVERITY), null, null);
+
     }
 
-    private void initDialog(SecuritySetup setup) {
-        setup.setId(setup.getHost() + "@" + setup.getRealm());
-        // this.addDialog.getIdText().setText();
-        this.addDialog.getHostText().setText(setup.getHost());
-        this.addDialog.getRealmText().setText(setup.getRealm());
-        this.addDialog.getUserNameText().setText(setup.getUserName());
-        this.addDialog.getPwdText().setText(setup.getPwd());
+    private void initDialog() {
         this.createHostDataBinder(this.selectionHost, this.selectionRealm, this.addOperation);
 
         addDialog.getHostText().addModifyListener(createModifyListener());

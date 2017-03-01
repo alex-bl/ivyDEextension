@@ -36,6 +36,7 @@ public class SecuritySetupPreferencePage extends PreferencePage implements IWork
     public static final String PEREFERENCE_PAGE_ID = "org.apache.ivyde.eclipse.ui.preferences.SecuritySetupPreferencePage";
 
     private SecuritySetupEditor securitySetupComposite;
+
     private SecuritySetupController buttonController;
 
     public SecuritySetupPreferencePage() {
@@ -48,29 +49,43 @@ public class SecuritySetupPreferencePage extends PreferencePage implements IWork
 
     protected Control createContents(Composite parent) {
         securitySetupComposite = new SecuritySetupEditor(parent, SWT.NONE);
-        securitySetupComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+        securitySetupComposite
+                .setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
         buttonController = new SecuritySetupController(securitySetupComposite);
         buttonController.addHandlers();
 
-        //TODO: SecuritySetup()
-        securitySetupComposite.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());        
+        securitySetupComposite.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());
 
         return securitySetupComposite;
     }
 
-    public boolean performOk() {        
-        //TODO: Do what? => just copy credentials to ivyStorage or also copy them to eclipse-storage?
-//        SecuritySetup credentials = securitySetupComposite.getSecuritySetup();
-//        IvyDEsecurityHelper.addCredentialsToSecureStorage(credentials);
-//        IvyDEsecurityHelper.addCredentialsToIvyCredentialStorage(credentials);
+    /*
+     * NOTE: The table containing the credentials is directly coupled with the eclipse
+     * secure-storage: 
+     * - all operations are performed immediately on the secure-storage 
+     * - performOk(), performApply() and performDefaults() won't have any additional effects: They just
+     * redo performed operations (for the sake of completeness)
+     */
+
+    @Override
+    public boolean performOk() {
+        // TODO: Do what? => directly coupled with secure-storage
         IvyDEsecurityHelper.cpyCredentialsFromSecureToIvyStorage();
-        
         return true;
     }
 
+    @Override
+    protected void performApply() {
+        // TODO: Do what? => directly coupled with secure-storage
+        IvyDEsecurityHelper.cpyCredentialsFromSecureToIvyStorage();
+        super.performApply();
+    }
+
+    @Override
     protected void performDefaults() {
-      //TODO: Do nothing? => coupled with secure-store...
-      //  securitySetupComposite.init(new SecuritySetup());
+        // TODO: Do nothing? => directly coupled with secure-storage...
+        securitySetupComposite.init(IvyDEsecurityHelper.getCredentialsFromSecureStore());
+        super.performDefaults();
     }
 }

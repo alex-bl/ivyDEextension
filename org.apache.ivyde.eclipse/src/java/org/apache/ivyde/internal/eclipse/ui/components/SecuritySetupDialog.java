@@ -17,10 +17,8 @@
  */
 package org.apache.ivyde.internal.eclipse.ui.components;
 
-import org.apache.ivyde.eclipse.cp.SecuritySetup;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -44,7 +42,7 @@ public class SecuritySetupDialog extends Dialog {
     public static final String TOOLTIP_PASSWORD = "The password";
 
     private Text idText;
-    
+
     private Text hostText;
 
     private Text realmText;
@@ -54,7 +52,7 @@ public class SecuritySetupDialog extends Dialog {
     private Text pwdText;
 
     private Label idLabel;
-    
+
     private Label hostLabel;
 
     private Label realmLabel;
@@ -62,17 +60,13 @@ public class SecuritySetupDialog extends Dialog {
     private Label userNameLabel;
 
     private Label pwdLabel;
-    
+
     private Label errorLabel;
-    
+
     private Label errorIcon;
 
-    //needed here: otherwise disposed
-    private SecuritySetup contentHolder;
-    
-    public SecuritySetupDialog(Shell parentShell, SecuritySetup defaultVal) {
+    public SecuritySetupDialog(Shell parentShell) {
         super(parentShell);
-        this.contentHolder=defaultVal;
     }
 
     @Override
@@ -81,24 +75,23 @@ public class SecuritySetupDialog extends Dialog {
         Composite errorContainer = (Composite) super.createDialogArea(parent);
         GridLayout errorLayout = new GridLayout(2, false);
         errorContainer.setLayout(errorLayout);
-        
+
         errorIcon = new Label(errorContainer, SWT.NONE);
         errorIcon.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_ERROR));
-        //errorIcon.setLayoutData(new GridData(20,20));
-        
+        // errorIcon.setLayoutData(new GridData(20,20));
+
         errorLabel = new Label(errorContainer, SWT.NONE);
         errorLabel.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false));
 
         Label separator = new Label(errorContainer, SWT.HORIZONTAL | SWT.SEPARATOR);
-        separator.setLayoutData(new GridData(GridData.FILL,GridData.BEGINNING,true, false,2,1));
-        
+        separator.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false, 2, 1));
+
         Composite container = (Composite) super.createDialogArea(parent);
         GridLayout layout = new GridLayout(2, false);
-//        layout.marginRight = 5;
-//        layout.marginLeft = 10;
+        // layout.marginRight = 5;
+        // layout.marginLeft = 10;
         container.setLayout(layout);
-        
-        
+
         idLabel = new Label(container, SWT.NONE);
         idLabel.setText("Id:");
 
@@ -106,7 +99,7 @@ public class SecuritySetupDialog extends Dialog {
         idText.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false));
         idText.setEditable(false);
         idText.setEnabled(false);
-        
+
         hostLabel = new Label(container, SWT.NONE);
         hostLabel.setText("Host:");
 
@@ -125,8 +118,7 @@ public class SecuritySetupDialog extends Dialog {
         userNameLabel.setText("Username:");
 
         userNameText = new Text(container, SWT.SINGLE | SWT.BORDER);
-        userNameText
-                .setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false));
+        userNameText.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false));
         userNameText.setToolTipText(TOOLTIP_USERNAME);
 
         pwdLabel = new Label(container, SWT.NONE);
@@ -135,7 +127,7 @@ public class SecuritySetupDialog extends Dialog {
         pwdText = new Text(container, SWT.PASSWORD | SWT.BORDER);
         pwdText.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
         pwdText.setToolTipText(TOOLTIP_PASSWORD);
-                       
+
         return container;
     }
 
@@ -144,7 +136,7 @@ public class SecuritySetupDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        //newShell.setText("Add");
+        // newShell.setText("Add");
     }
 
     @Override
@@ -165,28 +157,20 @@ public class SecuritySetupDialog extends Dialog {
         userNameText.setEnabled(enabled);
         pwdLabel.setEnabled(enabled);
         pwdText.setEnabled(enabled);
-        
+
         errorIcon.setEnabled(true);
         errorLabel.setEnabled(true);
 
     }
 
-    private void saveSecuritySetup() {
-        this.contentHolder = new SecuritySetup();
-        this.contentHolder.setHost(hostText.getText());
-        this.contentHolder.setRealm(realmText.getText());
-        this.contentHolder.setUserName(userNameText.getText());
-        this.contentHolder.setPwd(pwdText.getText());
-    }
-
-    public Button getOkButton(){
+    public Button getOkButton() {
         return super.getButton(IDialogConstants.OK_ID);
     }
-    
+
     @Override
     protected void okPressed() {
-        saveSecuritySetup();
-            super.okPressed();
+        // TODO: Do something?
+        super.okPressed();
     }
 
     /**
@@ -218,13 +202,6 @@ public class SecuritySetupDialog extends Dialog {
     }
 
     /**
-     * @return the contentHolder
-     */
-    public SecuritySetup getContentHolder() {
-        return contentHolder;
-    }
-
-    /**
      * @return the idText
      */
     public Text getIdText() {
@@ -245,6 +222,4 @@ public class SecuritySetupDialog extends Dialog {
         return errorIcon;
     }
 
-
-    
 }

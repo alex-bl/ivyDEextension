@@ -15,26 +15,20 @@
  *  limitations under the License.
  *
  */
-package org.apache.ivyde.internal.eclipse.controller.validator;
+package org.apache.ivyde.internal.eclipse.validator.reaction;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.ivyde.internal.eclipse.validator.IValidationReaction;
 
-public final class ValidationProcContainer {
+public class NopValidationReaction implements IValidationReaction {
 
-    private static Map<String, ValidationProcess> observables = new HashMap<String, ValidationProcess>();
-
-    public ValidationProcContainer INSTANCE = new ValidationProcContainer();
-
-    private ValidationProcContainer() {
-
+    @Override
+    public void ok() {
+        // Do nothing ;-)
     }
 
-    public static void registerProc(String key, ValidationProcess value) {
-        observables.put(key, value);
+    @Override
+    public void error() {
+        // Do nothing ;-)
     }
 
-    public static ValidationProcess getProc(String key) {
-        return observables.get(key);
-    }
 }

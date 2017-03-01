@@ -15,22 +15,29 @@
  *  limitations under the License.
  *
  */
-package org.apache.ivyde.internal.eclipse.controller.validator;
+package org.apache.ivyde.internal.eclipse.validator.impl;
 
-public class HostValidationProc extends ValidationProcess {
+import org.apache.ivyde.internal.eclipse.validator.BaseValidator;
+import org.apache.ivyde.internal.eclipse.validator.IValidationReaction;
+import org.eclipse.core.databinding.validation.ValidationStatus;
+import org.eclipse.core.runtime.IStatus;
+
+public class RealmValidator extends BaseValidator {
 
     /**
      * @param reaction
      */
-    public HostValidationProc(IValidationReaction reaction) {
+    public RealmValidator(IValidationReaction reaction) {
         super(reaction);
     }
 
-    // just check if empty
     @Override
-    public boolean doValidate(Object toValidate) {
-        String host = (String) toValidate;
-        super.setErrorMessage(EMPTY_ERROR.replace("$entry", "Host"));
-        return !host.equals("");
+    public boolean doValidation(Object validatedObject) {
+        String realm = (String) validatedObject;
+        boolean valid = !realm.equals("");
+        IStatus validationStatus = valid ? ValidationStatus.ok() : ValidationStatus
+                .error(EMPTY_ERROR.replace("$entry", "Realm"));
+        super.setValidationStatus(validationStatus);
+        return !realm.equals("");
     }
 }

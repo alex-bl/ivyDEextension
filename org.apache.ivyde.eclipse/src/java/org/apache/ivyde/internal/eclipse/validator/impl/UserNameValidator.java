@@ -15,9 +15,25 @@
  *  limitations under the License.
  *
  */
-package org.apache.ivyde.internal.eclipse.controller.validator;
+package org.apache.ivyde.internal.eclipse.validator.impl;
 
-public interface IValidationExclusion {
+import org.apache.ivyde.internal.eclipse.validator.BaseValidator;
+import org.apache.ivyde.internal.eclipse.validator.IValidationReaction;
+import org.eclipse.core.databinding.validation.ValidationStatus;
 
-    public boolean exclusionNeeded();
+public class UserNameValidator extends BaseValidator {
+
+    /**
+     * @param reaction
+     */
+    public UserNameValidator(IValidationReaction reaction) {
+        super(reaction);
+    }
+
+    @Override
+    public boolean doValidation(Object validatedObject) {
+        // TODO Validation here?
+        super.setValidationStatus(ValidationStatus.ok());
+        return true;
+    }
 }

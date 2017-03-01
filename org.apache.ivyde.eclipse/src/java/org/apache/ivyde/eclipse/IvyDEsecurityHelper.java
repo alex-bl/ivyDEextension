@@ -93,10 +93,12 @@ public final class IvyDEsecurityHelper {
                 for (String childChildName : childChildNames) {
                     ISecurePreferences childChildNode = childNode.node(childChildName);
                     try {
-                        setupValues.add(new SecuritySetup(
-                                childChildNode.get(HOST_KEY, "localhost"), childChildNode.get(
-                                    REALM_KEY, "basic"), childChildNode.get(USERNAME_KEY, null),
-                                childChildNode.get(PASSWORD_KEY, null)));
+                        SecuritySetup toAdd = new SecuritySetup(
+                            childChildNode.get(HOST_KEY, "localhost"), childChildNode.get(
+                                REALM_KEY, "basic"), childChildNode.get(USERNAME_KEY, null),
+                            childChildNode.get(PASSWORD_KEY, null));
+                        setupValues.add(toAdd);
+                        IvyPlugin.logInfo("Credentials " + toAdd.toString() + " loaded from eclipse secure storage");
                     } catch (StorageException e1) {
                         IvyPlugin.logError(e1.getMessage(), e1);
                     }
@@ -153,7 +155,7 @@ public final class IvyDEsecurityHelper {
         // need to invalidate => on credentialStore just add-ops allowed
         CredentialsStore.INSTANCE.addCredentials(setup.getHost(), setup.getRealm(), null, null);
         IvyPlugin.logInfo("Credentials " + setup
-                + " invalidated on ivy credential store: Removed on next eclipse startup.");
+                + " invalidated on ivyDE credential store: Removed on next eclipse startup.");
     }
 
     public static boolean credentialsInSecureStorage() {
