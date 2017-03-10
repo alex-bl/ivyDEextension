@@ -165,8 +165,8 @@ public class SecuritySetup implements Comparable<SecuritySetup> {
 
     @Override
     public String toString() {
-        return "[storageId: '" + this.host + "@" + this.realm + "', host='" + this.host + ", realm='"
-                + this.realm + "', user='" + this.userName + ", password=******']";
+        return "[storageId: '" + this.host + "@" + this.realm + "', host='" + this.host + "', realm='"
+                + this.realm + "', user='" + this.userName + "', password='******']";
     }
 
     public int compareTo(SecuritySetup o) {
