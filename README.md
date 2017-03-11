@@ -1,5 +1,5 @@
 # ivyDEextension
-This project is an extension to the eclipse-plugin [Apache IvyDE 2.2.0.final-201311091524-RELEASE](https://ant.apache.org/ivy/ivyde/) from the [Apache Software Foundation](https://www.apache.org/).
+This project is an extension to the eclipse-plugin [Apache IvyDE 2.2.0.final-201311091524-RELEASE](https://ant.apache.org/ivy/ivyde/) from the [Apache Software Foundation](https://www.apache.org/). ***So please have a look at the original [README](/README.txt)-, [LICENSE](/LICENSE)- and [NOTICE](/NOTICE) files***.
 
 It is build on top of the latest ApacheIvyDE release (2.2.0.final) and extends its functionallity by providing the possibility to manage credentials - needed to retrieve artifacts from protected repositories - using the eclipse secure storage instead of setting them in plaintext within the ANT-buildscripts or ivySettings.
 
