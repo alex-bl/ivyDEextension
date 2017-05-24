@@ -62,7 +62,8 @@ public class SecuritySetupController {
     private MessageDialog confirmationDialog;
 
     private SecuritySetup currentSelection = new SecuritySetup();
-
+    private SecuritySetup currentSelectionOldVal = new SecuritySetup();
+    
     private String selectionHost;
 
     private String selectionRealm;
@@ -131,7 +132,7 @@ public class SecuritySetupController {
                     setupEditorGUI.getEditBtn().setEnabled(false);
                     setupEditorGUI.getDeleteBtn().setEnabled(false);
                 } else {
-                    // TODO: do something?
+                    currentSelection.setAllValues(currentSelectionOldVal);
                 }
                 addDialog.close();
             }
@@ -145,7 +146,7 @@ public class SecuritySetupController {
                 confirmationDialog = GUIfactoryHelper.buildConfirmationDialog(
                     setupEditorGUI.getShell(), "Confirmation",
                     "Remove selected credentials from secure storage?");
-                if (confirmationDialog.open() == 0) {
+                if (confirmationDialog.open() == Window.OK) {
                     currentSelection.setHost(selectionHost);
                     currentSelection.setRealm(selectionRealm);
                     IvyDEsecurityHelper.removeCredentials(new SecuritySetup(selectionHost,
@@ -171,6 +172,8 @@ public class SecuritySetupController {
                     selectionHost = currentSelection.getHost();
                     selectionRealm = currentSelection.getRealm();
                     selectionUserName = currentSelection.getUserName();
+                    currentSelectionOldVal = new SecuritySetup(selectionHost, selectionRealm,
+                            selectionUserName, currentSelection.getPwd());
                 } else {
                     currentSelection = new SecuritySetup();
                 }

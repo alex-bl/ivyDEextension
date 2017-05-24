@@ -47,6 +47,14 @@ public class SecuritySetup implements Comparable<SecuritySetup> {
         this.pwd = pwd;
     }
 
+    public void setAllValues(SecuritySetup toSet){
+        this.id=toSet.getHost()+"@"+toSet.getRealm();
+        this.host = toSet.getHost();
+        this.realm = toSet.getRealm();
+        this.userName = toSet.getUserName();
+        this.pwd = toSet.getPwd(); 
+    }
+    
     /**
      * @return the id
      */

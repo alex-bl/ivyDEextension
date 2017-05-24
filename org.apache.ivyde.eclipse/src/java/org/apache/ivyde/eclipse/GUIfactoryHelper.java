@@ -55,7 +55,6 @@ public final class GUIfactoryHelper {
             @Override
             public String getText(Object element) {
                 return ((SecuritySetup) element).getUserName();
-                //return SECRET;
             }
         };
     }
@@ -64,7 +63,6 @@ public final class GUIfactoryHelper {
         return new ColumnLabelProvider() {
             @Override
             public String getText(Object element) {
-                //return ((SecuritySetup) element).getPwd();
                 return SECRET;
             }
         };
